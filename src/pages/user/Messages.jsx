@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import MessageBubble from "../../components/profile/MessageBubble";
 import { getMessages, sendMessage } from "../../api/messageApi";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://kuraz-backend-sin2.onrender.com");
 
 export default function Messages() {
   const [messages, setMessages] = useState([]);

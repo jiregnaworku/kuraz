@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 import { getConversation, sendAdminMessage } from "../../api/adminMessageApi";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://kuraz-backend-sin2.onrender.com");
 
 export default function AdminChat({ selectedUser }) {
   const [messages, setMessages] = useState([]);

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/comments";
+const API_URL = "https://kuraz-backend-sin2.onrender.com/api/comments";
 
 const authHeader = () => {
   const token = localStorage.getItem("token");

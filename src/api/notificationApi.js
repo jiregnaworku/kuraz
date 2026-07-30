@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/notifications";
+const API_URL = "https://kuraz-backend-sin2.onrender.com/api/notifications";
 
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
