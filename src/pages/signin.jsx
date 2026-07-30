@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaLock, FaSignInAlt } from "react-icons/fa";
 import { useState } from "react";
-import axios from "axios";
+import API from "../api/api";
 
 export default function Signin() {
   const navigate = useNavigate();
@@ -22,13 +22,10 @@ export default function Signin() {
       setLoading(true);
       setMessage("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          phone: formData.phone,
-          password: formData.password,
-        },
-      );
+      const response = await API.post("/auth/login", {
+        phone: formData.phone,
+        password: formData.password,
+      });
 
       // Save authentication data
 

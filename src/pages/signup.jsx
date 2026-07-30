@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaLock, FaUserPlus, FaUser } from "react-icons/fa";
 import { useState } from "react";
-import axios from "axios";
+import API from "../api/api";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -29,14 +29,11 @@ export default function Signup() {
       setLoading(true);
       setMessage("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
-        {
-          fullName: formData.fullName,
-          phone: formData.phone,
-          password: formData.password,
-        },
-      );
+      const response = await API.post("/auth/signup", {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        password: formData.password,
+      });
 
       localStorage.setItem("token", response.data.token);
 
