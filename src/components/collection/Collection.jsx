@@ -3,7 +3,6 @@ import { FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 import { getProducts } from "../../api/productApi";
-
 import ProductCard from "./ProductCard";
 
 export default function Collection() {
@@ -26,47 +25,48 @@ export default function Collection() {
   }, []);
 
   return (
-    <section id="collection" className="bg-[#24312c] py-24 px-5 lg:px-14">
+    <section
+      id="collection"
+      className="bg-[#24312c] py-16 px-4 sm:py-24 sm:px-5 lg:px-14"
+    >
       {/* Header */}
-
-      <div className="mx-auto mb-14 max-w-3xl text-center">
-        <span className="text-sm font-semibold uppercase tracking-[6px] text-[#d4af37]">
+      <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-14">
+        <span className="text-xs font-semibold uppercase tracking-[4px] text-[#d4af37] sm:text-sm sm:tracking-[6px]">
           Our Collection
         </span>
 
-        <h2 className="mt-4 text-5xl font-bold text-white md:text-4xl">
+        <h2 className="mt-3 text-3xl font-bold text-white sm:mt-4 sm:text-4xl md:text-5xl">
           Ethiopian Elegance
         </h2>
 
-        <p className="mt-6 leading-8 text-gray-300">
+        <p className="mt-4 text-sm leading-7 text-gray-300 sm:mt-6 sm:text-base sm:leading-8">
           Explore our handcrafted Habesha cultural dresses inspired by Ethiopian
           heritage and designed with modern elegance.
         </p>
       </div>
 
-      {/* Products */}
-
+      {/* Products Container: Hybrid Flex (Mobile) / Grid (Desktop) */}
       {loading ? (
         <p className="text-center text-white">Loading collection...</p>
       ) : (
         <div
           className="
-  mx-auto
-  grid
-  max-w-7xl
-  grid-cols-2
-  gap-3
-  sm:gap-5
-  lg:grid-cols-3
-  xl:grid-cols-4
-  "
+            mx-auto flex max-w-7xl 
+            overflow-x-auto snap-x snap-mandatory 
+            gap-4 pb-8 px-2 
+            [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+            
+            /* Desktop Grid Override */
+            md:grid md:grid-cols-2 md:overflow-visible md:snap-none md:pb-0 md:px-0 md:gap-5 
+            lg:grid-cols-3 xl:grid-cols-4
+          "
         >
           {products.length > 0 ? (
             products.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))
           ) : (
-            <p className="col-span-full text-center text-lg text-white">
+            <p className="w-full text-center text-base text-white sm:text-lg">
               No products available.
             </p>
           )}
@@ -74,14 +74,17 @@ export default function Collection() {
       )}
 
       {/* See More */}
-
-      <div className="mt-14 flex justify-center">
+      <div className="mt-10 flex justify-center sm:mt-14">
         <Link
           to="/collection"
-          className="flex items-center gap-3 rounded-full bg-[#d4af37] px-8 py-4 font-semibold text-white transition hover:bg-[#b88b21]"
+          className="
+            flex items-center gap-2 rounded-full bg-[#d4af37] px-6 py-3 
+            text-sm font-semibold text-white transition hover:bg-[#b88b21]
+            sm:gap-3 sm:px-8 sm:py-4 sm:text-base
+          "
         >
           See More Collection
-          <FaArrowRight />
+          <FaArrowRight className="text-xs sm:text-sm" />
         </Link>
       </div>
     </section>

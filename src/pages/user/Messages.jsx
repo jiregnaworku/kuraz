@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
-import { FaPaperPlane } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaPaperPlane, FaHeadset } from "react-icons/fa";
+import { io } from "socket.io-client";
 
 import MessageBubble from "../../components/profile/MessageBubble";
-
 import { getMessages, sendMessage } from "../../api/messageApi";
+
+const socket = io("http://localhost:5000");
 
 export default function Messages() {
   const [messages, setMessages] = useState([]);
@@ -13,6 +15,8 @@ export default function Messages() {
   const [loading, setLoading] = useState(true);
 
   const [sending, setSending] = useState(false);
+
+  const bottomRef = useRef(null);
 
   // ==========================
   // Load Messages
@@ -25,7 +29,7 @@ export default function Messages() {
 
         setMessages(data.messages || []);
       } catch (error) {
-        console.log("Failed to load messages", error);
+        console.log(error);
       } finally {
         setLoading(false);
       }
@@ -33,6 +37,42 @@ export default function Messages() {
 
     loadMessages();
   }, []);
+
+  // ==========================
+  // Socket Connection
+  // ==========================
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
+    if (user?._id) {
+      socket.emit("join", user._id);
+    }
+
+    socket.on("receiveMessage", (message) => {
+      setMessages((prev) => {
+        const exists = prev.some((item) => item._id === message._id);
+
+        if (exists) return prev;
+
+        return [...prev, message];
+      });
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, []);
+
+  // ==========================
+  // Auto Scroll
+  // ==========================
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   // ==========================
   // Send Message
@@ -44,15 +84,17 @@ export default function Messages() {
     try {
       setSending(true);
 
-      const data = await sendMessage({
-        content: newMessage,
-      });
+      const ADMIN_ID = "ADMIN_USER_ID";
 
-      setMessages([...messages, data.message]);
+      await sendMessage({
+        receiverId: ADMIN_ID,
+
+        message: newMessage,
+      });
 
       setNewMessage("");
     } catch (error) {
-      console.log("Message sending failed", error);
+      console.log(error);
     } finally {
       setSending(false);
     }
@@ -60,8 +102,20 @@ export default function Messages() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20 text-gray-500">
-        Loading messages...
+      <div
+        className="
+      flex
+      min-h-[50vh]
+      items-center
+      justify-center
+      px-4
+      text-center
+      text-sm
+      text-[#24312c]
+      sm:text-base
+      "
+      >
+        Loading conversations...
       </div>
     );
   }
@@ -69,124 +123,296 @@ export default function Messages() {
   return (
     <div
       className="
-      rounded-3xl
-      bg-white
-      p-6
-      shadow-xl
-      "
+    w-full
+    overflow-hidden
+    rounded-2xl
+    border
+    border-[#d4af37]/20
+
+    bg-gradient-to-br
+    from-[#000000]
+    via-green-900
+    to-[#02300b]
+
+    shadow-lg
+
+    sm:rounded-3xl
+    sm:shadow-xl
+    "
     >
-      {/* Header */}
+      {/* HEADER */}
 
       <div
         className="
-        mb-6
-        border-b
-        pb-4
-        "
-      >
-        <h1
-          className="
-          text-2xl
-          font-bold
-          text-[#24312c]
-          "
-        >
-          Messages
-        </h1>
+      flex
+      items-center
+      gap-3
 
-        <p
+      bg-[#1b7251]
+
+      px-3
+      py-4
+
+      xs:px-4
+      sm:px-6
+      md:px-8
+      "
+      >
+        <div
           className="
-          text-sm
-          text-gray-500
-          "
+        flex
+        h-10
+        w-10
+        shrink-0
+        items-center
+        justify-center
+
+        rounded-full
+
+        bg-[#d4af37]
+
+        text-base
+        text-[#24312c]
+
+        xs:h-11
+        xs:w-11
+
+        sm:h-12
+        sm:w-12
+        sm:text-xl
+        "
         >
-          Chat with Kuraz Design support
-        </p>
+          <FaHeadset />
+        </div>
+
+        <div className="min-w-0">
+          <h1
+            className="
+          truncate
+
+          text-base
+          font-bold
+          text-white
+
+          xs:text-lg
+
+          sm:text-2xl
+          "
+          >
+            Kuraz Support
+          </h1>
+
+          <p
+            className="
+          truncate
+
+          text-xs
+          text-gray-200
+
+          xs:text-sm
+          "
+          >
+            Orders, products and delivery help
+          </p>
+        </div>
       </div>
 
-      {/* Messages */}
+      {/* CHAT AREA */}
 
       <div
         className="
-        h-[450px]
-        overflow-y-auto
-        rounded-2xl
-        bg-gray-50
-        p-5
-        "
+      h-[55vh]
+
+      min-h-[350px]
+
+      max-h-[600px]
+
+      overflow-y-auto
+
+      px-2
+      py-4
+
+      xs:px-3
+
+      sm:px-6
+      sm:py-6
+      "
       >
         {messages.length > 0 ? (
           messages.map((message) => (
             <MessageBubble key={message._id} message={message} />
           ))
         ) : (
-          <p
+          <div
             className="
+            flex
+            h-full
+            flex-col
+            items-center
+            justify-center
+
+            px-4
+
             text-center
-            text-gray-400
             "
           >
-            No messages yet
-          </p>
+            <FaHeadset
+              className="
+              mb-3
+
+              text-4xl
+
+              text-[#d4af37]
+
+              sm:text-5xl
+              "
+            />
+
+            <h3
+              className="
+              text-base
+              font-semibold
+
+              text-[#24312c]
+
+              sm:text-lg
+              "
+            >
+              Start conversation
+            </h3>
+
+            <p
+              className="
+              mt-2
+
+              max-w-xs
+
+              text-xs
+              leading-5
+
+              text-gray-500
+
+              sm:text-sm
+              "
+            >
+              Ask about your order, custom dresses or delivery.
+            </p>
+          </div>
         )}
+
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+      {/* INPUT AREA */}
 
       <div
         className="
-        mt-5
-        flex
-        gap-3
-        "
+      border-t
+      border-[#d4af37]/20
+
+      bg-white/70
+
+      p-3
+
+      xs:p-4
+
+      sm:p-6
+      "
       >
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSend();
-            }
-          }}
-          placeholder="Write a message..."
+        <div
           className="
+        flex
+        items-center
+
+        gap-2
+
+        sm:gap-3
+        "
+        >
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSend();
+              }
+            }}
+            placeholder="Write message..."
+            className="
+          min-w-0
           flex-1
+
           rounded-xl
+
           border
-          px-4
+          border-gray-200
+
+          bg-[#fffaf0]
+
+          px-3
           py-3
+
+          text-sm
+
+          text-[#24312c]
+
           outline-none
 
-          focus:border-[#d4af37]
-          "
-        />
+          placeholder:text-gray-400
 
-        <button
-          onClick={handleSend}
-          disabled={sending}
-          className="
+          focus:border-[#d4af37]
+
+          xs:px-4
+
+          sm:rounded-2xl
+          sm:py-4
+          "
+          />
+
+          <button
+            onClick={handleSend}
+            disabled={sending}
+            className="
           flex
+
+          h-10
+          w-10
+
+          shrink-0
+
           items-center
           justify-center
 
-          rounded-xl
+          rounded-full
 
           bg-[#24312c]
 
-          px-5
+          text-sm
 
-          text-white
+          text-[#d4af37]
 
           transition
 
           hover:bg-[#d4af37]
 
+          hover:text-[#24312c]
+
           disabled:opacity-50
+
+
+          xs:h-12
+          xs:w-12
+
+          sm:h-14
+          sm:w-14
+
+          sm:text-lg
           "
-        >
-          <FaPaperPlane />
-        </button>
+          >
+            <FaPaperPlane />
+          </button>
+        </div>
       </div>
     </div>
   );

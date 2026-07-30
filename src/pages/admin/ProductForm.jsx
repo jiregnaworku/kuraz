@@ -147,30 +147,15 @@ lg:grid-cols-2
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="
-w-full
-rounded-xl
-bg-black/30
-border
-border-white/10
-px-4
-py-3
-text-white
-outline-none
-focus:border-[#d4af37]
-"
+              className="w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 text-white outline-none focus:border-[#d4af37]"
+              required
             >
               <option value="">Select Category</option>
-
-              <option>Wedding</option>
-
-              <option>Traditional</option>
-
-              <option>Men</option>
-
-              <option>Women</option>
-
-              <option>Kids</option>
+              <option value="Women's Dress">Women's Dress</option>
+              <option value="Men's Wear">Men's Wear</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Kids">Kids</option>
+              <option value="Accessories">Accessories</option>
             </select>
           </div>
 

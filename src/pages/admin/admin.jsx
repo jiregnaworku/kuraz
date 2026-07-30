@@ -3,7 +3,6 @@ import {
   FaShoppingBag,
   FaUsers,
   FaChartLine,
-  FaHome,
   FaArrowRight,
 } from "react-icons/fa";
 
@@ -11,7 +10,7 @@ import { Link } from "react-router-dom";
 
 export default function Admin() {
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-4 pb-24 pt-6 sm:px-6 lg:px-10 lg:pb-10">
+    <div className="min-h-screen bg-[#f5f6f8] px-4 pt-6 pb-10 sm:px-6 lg:px-10">
       {/* Header */}
 
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -73,13 +72,13 @@ export default function Admin() {
         </div>
       </section>
 
-      {/* Activity */}
+      {/* Recent Activity */}
 
       <section className="mt-8 rounded-2xl border bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-xl font-bold text-[#24312c]">Recent Activity</h2>
 
-          <button className="flex items-center gap-2 text-sm text-[#d4af37]">
+          <button className="flex items-center gap-2 text-sm text-[#d4af37] hover:underline">
             View all
             <FaArrowRight />
           </button>
@@ -89,43 +88,6 @@ export default function Admin() {
           No recent activity yet.
         </div>
       </section>
-
-      {/* Mobile Navigation */}
-
-      <div
-        className="
-        fixed
-        bottom-4
-        left-1/2
-        z-50
-        flex
-        w-[94%]
-        max-w-md
-        -translate-x-1/2
-        justify-around
-        rounded-2xl
-        bg-[#24312c]
-        p-3
-        shadow-xl
-        md:hidden
-      "
-      >
-        <MobileButton to="/admin" icon={<FaHome />} text="Home" />
-
-        <MobileButton
-          to="/admin/products"
-          icon={<FaBoxOpen />}
-          text="Products"
-        />
-
-        <MobileButton
-          to="/admin/orders"
-          icon={<FaShoppingBag />}
-          text="Orders"
-        />
-
-        <MobileButton to="/admin/users" icon={<FaUsers />} text="Users" />
-      </div>
     </div>
   );
 }
@@ -140,7 +102,8 @@ function StatCard({ title, number, icon }) {
       p-5
       shadow-sm
       transition
-      hover:shadow-md
+      hover:-translate-y-1
+      hover:shadow-lg
     "
     >
       <div
@@ -162,16 +125,7 @@ function StatCard({ title, number, icon }) {
 
       <p className="text-sm text-gray-500">{title}</p>
 
-      <h3
-        className="
-        mt-1
-        text-3xl
-        font-bold
-        text-[#24312c]
-      "
-      >
-        {number}
-      </h3>
+      <h3 className="mt-1 text-3xl font-bold text-[#24312c]">{number}</h3>
     </div>
   );
 }
@@ -181,66 +135,32 @@ function ActionCard({ to, icon, title, text }) {
     <Link
       to={to}
       className="
-group
-rounded-2xl
-bg-[#24312c]
-p-6
-text-white
-transition
-hover:-translate-y-1
-hover:shadow-xl
-"
+      group
+      rounded-2xl
+      bg-[#24312c]
+      p-6
+      text-white
+      transition
+      hover:-translate-y-1
+      hover:shadow-xl
+    "
     >
       <div
         className="
-mb-5
-text-4xl
-text-[#d4af37]
-transition
-group-hover:scale-110
-"
+        mb-5
+        text-4xl
+        text-[#d4af37]
+        transition-transform
+        duration-300
+        group-hover:scale-110
+      "
       >
         {icon}
       </div>
 
-      <h3
-        className="
-text-xl
-font-bold
-"
-      >
-        {title}
-      </h3>
+      <h3 className="text-xl font-bold">{title}</h3>
 
-      <p
-        className="
-mt-2
-text-sm
-text-gray-300
-"
-      >
-        {text}
-      </p>
-    </Link>
-  );
-}
-
-function MobileButton({ to, icon, text }) {
-  return (
-    <Link
-      to={to}
-      className="
-flex
-flex-col
-items-center
-gap-1
-text-xs
-text-white
-"
-    >
-      <span className="text-lg text-[#d4af37]">{icon}</span>
-
-      <span>{text}</span>
+      <p className="mt-2 text-sm text-gray-300">{text}</p>
     </Link>
   );
 }

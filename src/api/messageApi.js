@@ -14,6 +14,7 @@ const getAuthHeader = () => {
 
 // ==============================
 // GET USER MESSAGES
+// GET /api/messages
 // ==============================
 
 export const getMessages = async () => {
@@ -23,7 +24,8 @@ export const getMessages = async () => {
 };
 
 // ==============================
-// SEND MESSAGE TO ADMIN
+// SEND MESSAGE
+// POST /api/messages
 // ==============================
 
 export const sendMessage = async (messageData) => {
@@ -34,10 +36,11 @@ export const sendMessage = async (messageData) => {
 
 // ==============================
 // MARK MESSAGE AS READ
+// PATCH /api/messages/:id/read
 // ==============================
 
 export const markMessageRead = async (id) => {
-  const response = await axios.put(
+  const response = await axios.patch(
     `${API_URL}/${id}/read`,
     {},
     getAuthHeader(),
@@ -48,6 +51,7 @@ export const markMessageRead = async (id) => {
 
 // ==============================
 // DELETE MESSAGE
+// DELETE /api/messages/:id
 // ==============================
 
 export const deleteMessage = async (id) => {

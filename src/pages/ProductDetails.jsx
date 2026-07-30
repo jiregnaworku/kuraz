@@ -51,7 +51,7 @@ export default function ProductDetails() {
     <section
       className="
       min-h-screen
-      bg-[#f8f8f8]
+      bg-[#204445]
       px-4
       pb-20
       pt-28
@@ -70,14 +70,14 @@ export default function ProductDetails() {
           items-center
           gap-2
           rounded-xl
-          bg-[#24312c]
+          bg-[#8d5a5a]
           px-5
           py-3
           text-sm
           font-semibold
           text-white
           transition
-          hover:bg-[#1a2420]
+          hover:bg-[#487462]
           sm:text-base
           "
         >
@@ -143,7 +143,7 @@ export default function ProductDetails() {
 
                   ${
                     activeImage === index
-                      ? "border-[#d4af37]"
+                      ? "border-[#ccc9c0]"
                       : "border-transparent"
                   }
 
@@ -179,7 +179,7 @@ export default function ProductDetails() {
               className="
               w-fit
               rounded-full
-              bg-[#d4af37]
+              bg-[#a74da2]
               px-4
               py-2
               text-sm
@@ -196,7 +196,7 @@ export default function ProductDetails() {
               text-3xl
               font-bold
               leading-tight
-              text-[#24312c]
+              text-[#ffffff]
 
               sm:text-4xl
 
@@ -211,7 +211,7 @@ export default function ProductDetails() {
               mt-5
               text-2xl
               font-bold
-              text-[#d4af37]
+              text-[#ffffff]
 
               sm:text-3xl
               "
@@ -224,7 +224,7 @@ export default function ProductDetails() {
               mt-6
               text-sm
               leading-7
-              text-gray-700
+              text-white
 
               sm:text-base
               "
@@ -239,7 +239,7 @@ export default function ProductDetails() {
               mt-7
               space-y-3
               rounded-2xl
-              bg-white
+              bg-gray-500
               p-5
               shadow-sm
               "
@@ -278,11 +278,11 @@ export default function ProductDetails() {
                 gap-2
                 rounded-xl
                 border
-                border-gray-300
+                border-red-100
                 px-6
                 py-3
                 transition
-                hover:bg-gray-100
+                hover:bg-red-100
                 "
               >
                 <FaHeart />
@@ -297,7 +297,7 @@ export default function ProductDetails() {
                 gap-2
                 rounded-xl
                 border
-                border-gray-300
+                border-blue-100
                 px-6
                 py-3
                 transition
@@ -316,7 +316,7 @@ export default function ProductDetails() {
                 justify-center
                 gap-3
                 rounded-xl
-                bg-[#d4af37]
+                bg-[#2c2715]
                 px-8
                 py-3
                 font-bold

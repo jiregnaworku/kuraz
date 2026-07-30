@@ -1,28 +1,64 @@
 import { FaUserShield, FaUser } from "react-icons/fa";
 
 export default function MessageBubble({ message }) {
-  const isAdmin = message.senderRole === "admin";
+  const isAdmin =
+    message.sender?.role === "admin" || message.senderRole === "admin";
 
   return (
     <div
       className={`
+      mb-3
       flex
-      mb-4
+      w-full
+
       ${isAdmin ? "justify-start" : "justify-end"}
+
+      sm:mb-4
       `}
     >
       <div
         className={`
-        max-w-[75%]
+        max-w-[88%]
+
+        overflow-hidden
+
         rounded-2xl
-        px-5
+
+        px-3
         py-3
+
         shadow-md
+
+        break-words
+
+
+        xs:max-w-[85%]
+
+        sm:max-w-[75%]
+
+        sm:px-5
+        sm:py-4
+
 
         ${
           isAdmin
-            ? "bg-gray-100 text-[#24312c] rounded-bl-none"
-            : "bg-[#24312c] text-white rounded-br-none"
+            ? `
+              rounded-bl-none
+
+              border
+              border-[#d4af37]/20
+
+              bg-[#ad7d1d]
+
+              text-[#24312c]
+            `
+            : `
+              rounded-br-none
+
+              bg-[#24312c]
+
+              text-white
+            `
         }
         `}
       >
@@ -31,36 +67,60 @@ export default function MessageBubble({ message }) {
         <div
           className="
           mb-2
+
           flex
+
           items-center
+
           gap-2
+
           text-xs
+
           font-semibold
+
           "
         >
           {isAdmin ? (
             <>
-              <FaUserShield className="text-[#d4af37]" />
-              Admin
+              <FaUserShield
+                className="
+                  text-[#d4af37]
+                  "
+              />
+
+              <span>Kuraz Support</span>
             </>
           ) : (
             <>
-              <FaUser className="text-[#d4af37]" />
-              You
+              <FaUser
+                className="
+                  text-[#d4af37]
+                  "
+              />
+
+              <span>You</span>
             </>
           )}
         </div>
 
-        {/* Message */}
+        {/* Message Content */}
 
         <p
           className="
           break-words
+
+          whitespace-pre-wrap
+
           text-sm
-          leading-6
+
+          leading-5
+
+          sm:text-[15px]
+
+          sm:leading-6
           "
         >
-          {message.content}
+          {message.message}
         </p>
 
         {/* Time */}
@@ -68,10 +128,16 @@ export default function MessageBubble({ message }) {
         <p
           className={`
           mt-2
+
           text-right
-          text-xs
+
+          text-[10px]
+
+          sm:text-xs
+
 
           ${isAdmin ? "text-gray-400" : "text-gray-300"}
+
           `}
         >
           {new Date(message.createdAt).toLocaleString()}

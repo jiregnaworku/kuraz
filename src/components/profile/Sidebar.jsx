@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import {
   FaUser,
@@ -9,10 +9,13 @@ import {
   FaCog,
   FaBars,
   FaTimes,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const menuItems = [
     {
@@ -47,6 +50,23 @@ export default function Sidebar() {
     },
   ];
 
+  // ==========================
+  // LOGOUT
+  // ==========================
+
+  const logout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+
+    if (!confirmLogout) return;
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setOpen(false);
+
+    navigate("/signin");
+  };
+
   return (
     <>
       {/* MOBILE BUTTON */}
@@ -56,18 +76,24 @@ export default function Sidebar() {
         className="
         fixed
         left-5
-        top-28
-        z-[999]
+        top-5
+        z-[1000]
+
         flex
         h-12
         w-12
         items-center
         justify-center
+
         rounded-full
+
         bg-[#24312c]
+
         text-xl
         text-[#d4af37]
+
         shadow-lg
+
         lg:hidden
         "
       >
@@ -80,12 +106,12 @@ export default function Sidebar() {
         <div
           onClick={() => setOpen(false)}
           className="
-            fixed
-            inset-0
-            z-[998]
-            bg-black/40
-            lg:hidden
-            "
+          fixed
+          inset-0
+          z-[998]
+          bg-black/40
+          lg:hidden
+          "
         />
       )}
 
@@ -97,11 +123,16 @@ export default function Sidebar() {
         left-0
         top-0
         z-[999]
+
         h-screen
         w-72
+
         bg-[#24312c]
+
         p-6
+
         shadow-2xl
+
         transition-transform
         duration-300
 
@@ -130,12 +161,17 @@ export default function Sidebar() {
             flex
             h-20
             w-20
+
             items-center
             justify-center
+
             rounded-full
+
             bg-white
+
             text-3xl
             text-[#d4af37]
+
             "
           >
             <FaUser />
@@ -178,23 +214,27 @@ export default function Sidebar() {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `
-                  flex
-                  items-center
-                  gap-4
-                  rounded-xl
-                  px-4
-                  py-3
-                  font-medium
-                  transition
+                flex
+                items-center
+                gap-4
+
+                rounded-xl
+
+                px-4
+                py-3
+
+                font-medium
+
+                transition
 
 
-                  ${
-                    isActive
-                      ? "bg-[#d4af37] text-white"
-                      : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
-                  }
+                ${
+                  isActive
+                    ? "bg-[#d4af37] text-white"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
+                }
 
-                  `
+                `
               }
             >
               <span className="text-lg">{item.icon}</span>
@@ -202,6 +242,35 @@ export default function Sidebar() {
               {item.name}
             </NavLink>
           ))}
+
+          {/* LOGOUT */}
+
+          <button
+            onClick={logout}
+            className="
+            flex
+            w-full
+            items-center
+            gap-4
+
+            rounded-xl
+
+            px-4
+            py-3
+
+            font-medium
+
+            text-red-300
+
+            transition
+
+            hover:bg-red-500/20
+            hover:text-red-400
+            "
+          >
+            <FaSignOutAlt className="text-lg" />
+            Logout
+          </button>
         </nav>
       </aside>
     </>

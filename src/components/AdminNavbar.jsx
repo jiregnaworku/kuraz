@@ -1,27 +1,32 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+
 import {
-  FaBoxOpen,
-  FaShoppingBag,
-  FaUsers,
-  FaBell,
-  FaSignOutAlt,
-  FaTachometerAlt,
   FaBars,
+  FaTimes,
+  FaTachometerAlt,
+  FaShoppingBag,
+  FaBoxOpen,
+  FaUsers,
+  FaComments,
+  FaBell,
+  FaUserCircle,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
-import { useState } from "react";
-
 export default function AdminNavbar() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+
+  const admin = JSON.parse(localStorage.getItem("user") || "null");
 
   const menu = [
     {
       name: "Dashboard",
       path: "/admin",
       icon: <FaTachometerAlt />,
+      end: true,
     },
     {
       name: "Orders",
@@ -39,9 +44,9 @@ export default function AdminNavbar() {
       icon: <FaUsers />,
     },
     {
-      name: "Notifications",
-      path: "/admin/notifications",
-      icon: <FaBell />,
+      name: "Messages",
+      path: "/admin/messages",
+      icon: <FaComments />,
     },
   ];
 
@@ -49,9 +54,7 @@ export default function AdminNavbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    setOpen(false);
-
-    navigate("/");
+    navigate("/signin");
   };
 
   return (
@@ -59,108 +62,151 @@ export default function AdminNavbar() {
       <header
         className="
         fixed
+        inset-x-0
         top-0
-        left-0
         z-50
-        flex
-        h-20
-        w-full
-        items-center
-        justify-between
         border-b
         border-white/10
-        bg-[#12211d]/95
-        px-4
+        bg-[#1b2b26]/95
+        backdrop-blur-xl
         shadow-lg
-        backdrop-blur-md
-        sm:px-6
-        lg:px-10
         "
       >
-        {/* Logo */}
-
-        <Link
-          to="/admin"
-          className="
-          text-xl
-          font-bold
-          text-[#d4af37]
-          sm:text-2xl
-          "
-        >
-          Kuraz Admin
-        </Link>
-
-        {/* Desktop Menu */}
-
-        <nav
-          className="
-          hidden
-          items-center
-          gap-2
-          lg:flex
-          "
-        >
-          {menu.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`
-              flex
-              items-center
-              gap-2
-              rounded-xl
-              px-4
-              py-2
-              text-sm
-              transition
-
-              ${
-                location.pathname === item.path
-                  ? "bg-[#d4af37] text-[#12211d]"
-                  : "text-white hover:bg-white/10 hover:text-[#d4af37]"
-              }
-              `}
-            >
-              {item.icon}
-
-              <span>{item.name}</span>
-            </Link>
-          ))}
-        </nav>
-
-        {/* Right Section */}
-
         <div
           className="
+          mx-auto
           flex
+          h-20
+          max-w-7xl
           items-center
-          gap-3
+          justify-between
+          px-4
+          sm:px-6
+          lg:px-8
           "
         >
-          {/* Desktop Logout */}
+          {/* Logo */}
 
-          <button
-            onClick={handleLogout}
+          <Link
+            to="/admin"
+            className="
+            text-2xl
+            font-bold
+            tracking-wide
+            text-[#d4af37]
+            "
+          >
+            Kuraz Admin
+          </Link>
+
+          {/* Desktop Navigation */}
+
+          <nav
             className="
             hidden
             items-center
             gap-2
-            rounded-xl
-            px-4
-            py-2
-            text-red-400
-            transition
-            hover:bg-red-500/10
-            sm:flex
+            lg:flex
             "
           >
-            <FaSignOutAlt />
+            {menu.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.end}
+                className={({ isActive }) =>
+                  `
+                  flex
+                  items-center
+                  gap-2
+                  rounded-xl
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-medium
+                  transition-all
+                  duration-200
 
-            <span>Logout</span>
-          </button>
+                  ${
+                    isActive
+                      ? "bg-[#d4af37] text-[#1b2b26] shadow-md"
+                      : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
+                  }
+                  `
+                }
+              >
+                {item.icon}
+                {item.name}
+              </NavLink>
+            ))}
+          </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Right */}
+
+          <div
+            className="
+            hidden
+            items-center
+            gap-3
+            lg:flex
+            "
+          >
+            <Link
+              to="/admin/notifications"
+              className="
+              rounded-xl
+              p-3
+              text-gray-200
+              transition
+              hover:bg-white/10
+              hover:text-[#d4af37]
+              "
+            >
+              <FaBell size={18} />
+            </Link>
+
+            <Link
+              to="/admin/profile"
+              className="
+              flex
+              items-center
+              gap-3
+              rounded-xl
+              bg-white/5
+              px-3
+              py-2
+              transition
+              hover:bg-white/10
+              "
+            >
+              <FaUserCircle className="text-[#d4af37]" size={30} />
+
+              <div className="text-left">
+                <p className="text-sm font-semibold text-white">
+                  {admin?.fullName || "Admin"}
+                </p>
+
+                <p className="text-xs text-gray-400">Administrator</p>
+              </div>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="
+              rounded-xl
+              bg-red-500/10
+              p-3
+              text-red-400
+              transition
+              hover:bg-red-500
+              hover:text-white
+              "
+            >
+              <FaSignOutAlt />
+            </button>
+          </div>
+
+          {/* Mobile */}
 
           <button
             onClick={() => setOpen(!open)}
@@ -168,85 +214,119 @@ export default function AdminNavbar() {
             rounded-xl
             p-3
             text-white
-            transition
             hover:bg-white/10
             lg:hidden
             "
           >
-            <FaBars />
+            {open ? <FaTimes /> : <FaBars />}
           </button>
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer */}
 
-      {open && (
-        <div
-          className="
-          fixed
-          left-0
-          top-20
-          z-40
-          w-full
-          border-b
-          border-white/10
-          bg-[#12211d]
-          p-4
-          shadow-xl
-          lg:hidden
-          "
-        >
-          <nav
-            className="
-            flex
-            flex-col
-            gap-2
-            "
-          >
+      <div
+        className={`
+        fixed
+        top-0
+        right-0
+        z-50
+        h-screen
+        w-72
+        bg-[#1b2b26]
+        shadow-2xl
+        transition-transform
+        duration-300
+        lg:hidden
+
+        ${open ? "translate-x-0" : "translate-x-full"}
+        `}
+      >
+        <div className="flex items-center justify-between border-b border-white/10 p-5">
+          <h2 className="text-xl font-bold text-[#d4af37]">Admin Menu</h2>
+
+          <button onClick={() => setOpen(false)} className="text-white">
+            <FaTimes />
+          </button>
+        </div>
+
+        <div className="p-5">
+          <div className="mb-8 flex items-center gap-3">
+            <FaUserCircle size={50} className="text-[#d4af37]" />
+
+            <div>
+              <h3 className="font-semibold text-white">
+                {admin?.fullName || "Admin"}
+              </h3>
+
+              <p className="text-sm text-gray-400">Administrator</p>
+            </div>
+          </div>
+
+          <nav className="space-y-2">
             {menu.map((item) => (
-              <Link
+              <NavLink
                 key={item.path}
+                end={item.end}
                 to={item.path}
                 onClick={() => setOpen(false)}
-                className={`
-                flex
-                items-center
-                gap-3
-                rounded-xl
-                px-4
-                py-3
-                text-white
-                transition
+                className={({ isActive }) =>
+                  `
+                  flex
+                  items-center
+                  gap-3
+                  rounded-xl
+                  px-4
+                  py-3
+                  transition
 
-                ${
-                  location.pathname === item.path
-                    ? "bg-[#d4af37] text-[#12211d]"
-                    : "hover:bg-white/10"
+                  ${
+                    isActive
+                      ? "bg-[#d4af37] text-[#1b2b26]"
+                      : "text-gray-200 hover:bg-white/10"
+                  }
+                  `
                 }
-
-                `}
               >
                 {item.icon}
-
                 {item.name}
-              </Link>
+              </NavLink>
             ))}
 
-            {/* Mobile Logout */}
+            <NavLink
+              to="/admin/notifications"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-200 transition hover:bg-white/10"
+            >
+              <FaBell />
+              Notifications
+            </NavLink>
+
+            <NavLink
+              to="/admin/profile"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-200 transition hover:bg-white/10"
+            >
+              <FaUserCircle />
+              Profile
+            </NavLink>
 
             <button
               onClick={handleLogout}
               className="
-              mt-2
+              mt-4
               flex
+              w-full
               items-center
               gap-3
               rounded-xl
+              bg-red-500/10
               px-4
               py-3
               text-red-400
               transition
-              hover:bg-red-500/10
+              hover:bg-red-500
+              hover:text-white
               "
             >
               <FaSignOutAlt />
@@ -254,6 +334,19 @@ export default function AdminNavbar() {
             </button>
           </nav>
         </div>
+      </div>
+
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="
+          fixed
+          inset-0
+          z-40
+          bg-black/40
+          lg:hidden
+          "
+        />
       )}
     </>
   );

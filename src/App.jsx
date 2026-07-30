@@ -19,13 +19,15 @@ import Admin from "./pages/admin/admin";
 import AdminOrder from "./pages/admin/AdminOrder";
 import Products from "./pages/admin/products";
 import Users from "./pages/admin/AdminUser";
+import AdminMessages from "./pages/admin/AdminMessage";
 
 // Layouts
 import MainLayout from "./layouts/MainLayout";
 import AdminLayout from "./layouts/AdminLayout";
 
-// Protected Route
+// Protected Routes
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
+import ProtectedUserRoute from "./routes/ProtectedUserRoute";
 
 function App() {
   return (
@@ -38,8 +40,18 @@ function App() {
         <Route path="/signup" element={<Signup />} />
 
         <Route path="/signin" element={<Signin />} />
+
         <Route path="/collection" element={<Collection />} />
-        <Route path="/profile" element={<Profile />}>
+
+        {/* Protected User Profile */}
+        <Route
+          path="/profile/*"
+          element={
+            <ProtectedUserRoute>
+              <Profile />
+            </ProtectedUserRoute>
+          }
+        >
           <Route path="orders" element={<UserOrders />} />
 
           <Route path="messages" element={<Messages />} />
@@ -77,6 +89,9 @@ function App() {
 
         {/* Users */}
         <Route path="users" element={<Users />} />
+
+        {/* Messages */}
+        <Route path="messages" element={<AdminMessages />} />
       </Route>
 
       {/* ================= 404 ================= */}
