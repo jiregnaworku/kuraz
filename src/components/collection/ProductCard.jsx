@@ -126,20 +126,19 @@ export default function ProductCard({ product }) {
       "
     >
       {/* ==========================
-          IMAGE SECTION
+          IMAGE SECTION - Full Card Size
       ========================== */}
-      <div className="relative overflow-hidden bg-gray-100">
+      <div className="relative w-full" style={{ paddingBottom: "100%" }}>
         {product.images?.length > 0 ? (
           <img
             src={product.images[currentImage]}
             alt={product.name}
             className="
-              h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105
-              sm:h-56 md:h-64
+              absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105
             "
           />
         ) : (
-          <div className="flex h-40 items-center justify-center text-sm text-gray-400 sm:h-56 md:h-64">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-sm text-gray-400">
             No Image
           </div>
         )}
@@ -177,7 +176,7 @@ export default function ProductCard({ product }) {
         )}
 
         {/* ==========================
-            Floating Actions
+            FLOATING ACTION BUTTONS (Top Right)
         ========================== */}
         <div className="absolute right-2 top-2 flex flex-col gap-1.5 sm:right-3 sm:top-3 sm:gap-2">
           <button
@@ -213,77 +212,72 @@ export default function ProductCard({ product }) {
             <FaShareAlt className="text-sm sm:text-base" />
           </button>
         </div>
-      </div>
 
-      {/* ==========================
-          PRODUCT CONTENT
-      ========================== */}
-      <div className="flex flex-1 flex-col space-y-2 p-3 sm:space-y-3 sm:p-4">
-        <div>
-          <h3 className="truncate text-sm font-bold text-[#24312c] sm:text-base">
-            {product.name}
-          </h3>
-          <p className="mt-0.5 text-[10px] uppercase tracking-wide text-gray-400 sm:text-xs">
-            {product.category}
-          </p>
-          <p className="mt-2 hidden text-xs leading-5 text-gray-500 line-clamp-2 sm:block">
-            {product.description}
-          </p>
-        </div>
+        {/* ==========================
+            PRODUCT INFO OVERLAY (Bottom)
+        ========================== */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3 sm:p-4">
+          {/* Product Name & Category */}
+          <div>
+            <h3 className="truncate text-sm font-bold text-white sm:text-base">
+              {product.name}
+            </h3>
+            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-gray-300 sm:text-xs">
+              {product.category}
+            </p>
+          </div>
 
-        {/* Like & Comment Count */}
-        <div className="flex items-center justify-between border-t border-gray-100 pt-2 text-xs text-gray-500 sm:pt-3 sm:text-sm">
-          <button
-            onClick={handleLike}
-            className={`flex items-center gap-1.5 transition sm:gap-2 ${
-              liked ? "font-semibold text-red-500" : "hover:text-red-500"
-            }`}
-          >
-            <FaHeart className="text-xs sm:text-sm" />
-            <span>{likesCount}</span>
-          </button>
+          {/* Like & Comment Count */}
+          <div className="mt-2 flex items-center gap-4 text-xs text-gray-300 sm:gap-6 sm:text-sm">
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-1.5 transition sm:gap-2 ${
+                liked ? "font-semibold text-red-400" : "hover:text-red-400"
+              }`}
+            >
+              <FaHeart className="text-xs sm:text-sm" />
+              <span>{likesCount}</span>
+            </button>
 
-          <button
-            onClick={() => setCommentOpen(true)}
-            className="flex items-center gap-1.5 transition hover:text-[#d4af37] sm:gap-2"
-          >
-            <FaCommentDots className="text-xs sm:text-sm" />
-            <span>{commentsCount}</span>
-          </button>
-        </div>
+            <button
+              onClick={() => setCommentOpen(true)}
+              className="flex items-center gap-1.5 transition hover:text-[#d4af37] sm:gap-2"
+            >
+              <FaCommentDots className="text-xs sm:text-sm" />
+              <span>{commentsCount}</span>
+            </button>
+          </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <span className="text-base font-extrabold text-[#d4af37] sm:text-xl">
-            {product.price} ETB
-          </span>
-        </div>
+          {/* Price & Action Buttons */}
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-base font-extrabold text-[#d4af37] sm:text-xl">
+              {product.price} ETB
+            </span>
 
-        {/* Action Buttons */}
-        <div className="mt-auto grid grid-cols-2 gap-2 sm:gap-3">
-          <Link
-            to={`/product/${product._id}`}
-            className="
-              flex h-10 w-10 items-center justify-center rounded-xl bg-[#24312c]
-              text-xs font-semibold text-white transition hover:bg-[#18201d]
-              sm:h-auto sm:w-auto sm:gap-2 sm:px-4 sm:py-3 sm:text-sm
-            "
-          >
-            <FaEye className="text-sm sm:text-base" />
-            <span className="hidden sm:inline">See More</span>
-          </Link>
+            <div className="flex gap-2 sm:gap-3">
+              <Link
+                to={`/product/${product._id}`}
+                className="
+                  flex h-8 w-8 items-center justify-center rounded-xl bg-white/20
+                  text-white backdrop-blur-sm transition hover:bg-white/30
+                  sm:h-10 sm:w-10
+                "
+              >
+                <FaEye className="text-sm sm:text-base" />
+              </Link>
 
-          <button
-            onClick={handleOrder}
-            className="
-              flex h-10 w-10 items-center justify-center rounded-xl bg-[#d4af37]
-              text-xs font-semibold text-white transition hover:bg-[#b88f1d]
-              sm:h-auto sm:w-auto sm:gap-2 sm:px-4 sm:py-3 sm:text-sm
-            "
-          >
-            <FaShoppingBag className="text-sm sm:text-base" />
-            <span className="hidden sm:inline">Order</span>
-          </button>
+              <button
+                onClick={handleOrder}
+                className="
+                  flex h-8 w-8 items-center justify-center rounded-xl bg-[#d4af37]
+                  text-white transition hover:bg-[#b88f1d]
+                  sm:h-10 sm:w-10
+                "
+              >
+                <FaShoppingBag className="text-sm sm:text-base" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

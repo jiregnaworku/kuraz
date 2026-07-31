@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Signup from "./pages/signup";
 import Signin from "./pages/signin";
@@ -15,11 +16,13 @@ import Notifications from "./pages/user/Notifications";
 import Settings from "./pages/user/Settings";
 
 // Admin Pages
+import AdminNotifications from "./pages/admin/AdminNotifications";
 import Admin from "./pages/admin/admin";
 import AdminOrder from "./pages/admin/AdminOrder";
 import Products from "./pages/admin/products";
 import Users from "./pages/admin/AdminUser";
 import AdminMessages from "./pages/admin/AdminMessage";
+import AdminProfile from "./pages/admin/AdminProfile"; // Import Admin Profile
 
 // Layouts
 import MainLayout from "./layouts/MainLayout";
@@ -31,86 +34,134 @@ import ProtectedUserRoute from "./routes/ProtectedUserRoute";
 
 function App() {
   return (
-    <Routes>
-      {/* ================= CUSTOMER WEBSITE ================= */}
+    <>
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#fff",
+            color: "#24312c",
+            borderRadius: "12px",
+            padding: "16px",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+            fontSize: "14px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#d4af37",
+              secondary: "#fff",
+            },
+            style: {
+              border: "1px solid #d4af37",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+            style: {
+              border: "1px solid #ef4444",
+            },
+          },
+        }}
+      />
 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
+      <Routes>
+        {/* ================= CUSTOMER WEBSITE ================= */}
 
-        <Route path="/signup" element={<Signup />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/collection" element={<Collection />} />
 
-        <Route path="/signin" element={<Signin />} />
+          {/* Protected User Profile */}
+          <Route
+            path="/profile/*"
+            element={
+              <ProtectedUserRoute>
+                <Profile />
+              </ProtectedUserRoute>
+            }
+          >
+            <Route index element={<UserOrders />} />
+            <Route path="orders" element={<UserOrders />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
 
-        <Route path="/collection" element={<Collection />} />
+          {/* Product Details */}
+          <Route path="/product/:id" element={<ProductDetails />} />
 
-        {/* Protected User Profile */}
-        <Route
-          path="/profile/*"
-          element={
-            <ProtectedUserRoute>
-              <Profile />
-            </ProtectedUserRoute>
-          }
-        >
-          <Route path="orders" element={<UserOrders />} />
-
-          <Route path="messages" element={<Messages />} />
-
-          <Route path="notifications" element={<Notifications />} />
-
-          <Route path="settings" element={<Settings />} />
+          {/* Customer Order Page */}
+          <Route path="/order/:id" element={<CustomerOrder />} />
         </Route>
 
-        {/* Product Details */}
-        <Route path="/product/:id" element={<ProductDetails />} />
+        {/* ================= ADMIN DASHBOARD ================= */}
 
-        {/* Customer Order Page */}
-        <Route path="/order/:id" element={<CustomerOrder />} />
-      </Route>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdminRoute>
+              <AdminLayout />
+            </ProtectedAdminRoute>
+          }
+        >
+          {/* Dashboard */}
+          <Route index element={<Admin />} />
+          <Route path="dashboard" element={<Admin />} />
 
-      {/* ================= ADMIN DASHBOARD ================= */}
+          {/* Products */}
+          <Route path="products" element={<Products />} />
+          <Route path="notifications" element={<AdminNotifications />} />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedAdminRoute>
-            <AdminLayout />
-          </ProtectedAdminRoute>
-        }
-      >
-        {/* Dashboard */}
-        <Route index element={<Admin />} />
+          {/* Orders */}
+          <Route path="orders" element={<AdminOrder />} />
 
-        {/* Products */}
-        <Route path="products" element={<Products />} />
+          {/* Users */}
+          <Route path="users" element={<Users />} />
 
-        {/* Orders */}
-        <Route path="orders" element={<AdminOrder />} />
+          {/* Messages */}
+          <Route path="messages" element={<AdminMessages />} />
 
-        {/* Users */}
-        <Route path="users" element={<Users />} />
+          {/* Admin Profile */}
+          <Route path="profile" element={<AdminProfile />} />
 
-        {/* Messages */}
-        <Route path="messages" element={<AdminMessages />} />
-      </Route>
+          {/* Admin Notifications (if you have this page) */}
+          <Route
+            path="notifications"
+            element={<div>Admin Notifications Page</div>}
+          />
+        </Route>
 
-      {/* ================= 404 ================= */}
+        {/* ================= 404 ================= */}
 
-      <Route
-        path="*"
-        element={
-          <div className="mt-40 text-center">
-            <h1 className="text-4xl font-bold text-[#24312c]">
-              404 - Page Not Found
-            </h1>
-
-            <p className="mt-3 text-gray-500">
-              The page you're looking for doesn't exist.
-            </p>
-          </div>
-        }
-      />
-    </Routes>
+        <Route
+          path="*"
+          element={
+            <div className="mt-40 text-center">
+              <h1 className="text-4xl font-bold text-[#24312c]">
+                404 - Page Not Found
+              </h1>
+              <p className="mt-3 text-gray-500">
+                The page you're looking for doesn't exist.
+              </p>
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="mt-6 rounded-xl bg-[#d4af37] px-8 py-3 font-medium text-white transition hover:bg-[#b88f1d]"
+              >
+                Go Back Home
+              </button>
+            </div>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

@@ -157,8 +157,6 @@ export default function Navbar() {
 
           {!user && (
             <>
-              <NavItem text="Create Account" link="/signup" close={closeMenu} />
-
               <NavItem text="Login" link="/signin" close={closeMenu} />
             </>
           )}

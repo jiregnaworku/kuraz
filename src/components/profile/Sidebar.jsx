@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
@@ -11,10 +11,11 @@ import {
   FaTimes,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { getNotifications } from "../../api/notificationApi";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
-
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
   const menuItems = [
@@ -24,31 +25,55 @@ export default function Sidebar() {
       icon: <FaUser />,
       end: true,
     },
-
     {
       name: "My Orders",
       path: "/profile/orders",
       icon: <FaShoppingBag />,
     },
-
     {
       name: "Messages",
       path: "/profile/messages",
       icon: <FaComments />,
     },
-
     {
       name: "Notifications",
       path: "/profile/notifications",
       icon: <FaBell />,
+      badge: unreadCount > 0 ? unreadCount : null,
     },
-
     {
       name: "Settings",
       path: "/profile/settings",
       icon: <FaCog />,
     },
   ];
+
+  // ==========================
+  // Fetch Unread Notification Count
+  // ==========================
+
+  const fetchUnreadCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const data = await getNotifications();
+      const unread = data.notifications?.filter((n) => !n.isRead).length || 0;
+      setUnreadCount(unread);
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUnreadCount();
+
+    // Refresh count every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // ==========================
   // LOGOUT
@@ -69,13 +94,12 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* MOBILE BUTTON */}
-
+      {/* MOBILE BUTTON - Now on Right Side */}
       <button
         onClick={() => setOpen(!open)}
         className="
         fixed
-        left-5
+        right-5
         top-5
         z-[1000]
 
@@ -101,7 +125,6 @@ export default function Sidebar() {
       </button>
 
       {/* OVERLAY MOBILE */}
-
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -110,17 +133,17 @@ export default function Sidebar() {
           inset-0
           z-[998]
           bg-black/40
+          backdrop-blur-sm
           lg:hidden
           "
         />
       )}
 
-      {/* SIDEBAR */}
-
+      {/* SIDEBAR - Slides from Right */}
       <aside
         className={`
         fixed
-        left-0
+        right-0
         top-0
         z-[999]
 
@@ -135,26 +158,41 @@ export default function Sidebar() {
 
         transition-transform
         duration-300
-
+        ease-in-out
 
         lg:static
         lg:h-fit
         lg:rounded-3xl
         lg:translate-x-0
+        lg:shadow-lg
 
-
-        ${open ? "translate-x-0" : "-translate-x-full"}
+        ${open ? "translate-x-0" : "translate-x-full"}
 
         `}
       >
         {/* HEADER */}
-
         <div
           className="
           mb-8
           text-center
           "
         >
+          {/* Close button inside sidebar for mobile */}
+          <button
+            onClick={() => setOpen(false)}
+            className="
+            absolute
+            left-4
+            top-4
+            text-white/60
+            hover:text-white
+            transition-colors
+            lg:hidden
+            "
+          >
+            <FaTimes className="text-2xl" />
+          </button>
+
           <div
             className="
             mx-auto
@@ -200,7 +238,6 @@ export default function Sidebar() {
         </div>
 
         {/* MENU */}
-
         <nav
           className="
           space-y-3
@@ -227,10 +264,9 @@ export default function Sidebar() {
 
                 transition
 
-
                 ${
                   isActive
-                    ? "bg-[#d4af37] text-white"
+                    ? "bg-[#d4af37] text-white shadow-lg"
                     : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
 
@@ -239,12 +275,17 @@ export default function Sidebar() {
             >
               <span className="text-lg">{item.icon}</span>
 
-              {item.name}
+              <span className="flex-1">{item.name}</span>
+
+              {item.badge && (
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                  {item.badge > 9 ? "9+" : item.badge}
+                </span>
+              )}
             </NavLink>
           ))}
 
           {/* LOGOUT */}
-
           <button
             onClick={logout}
             className="

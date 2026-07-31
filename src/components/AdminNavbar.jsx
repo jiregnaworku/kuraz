@@ -51,10 +51,12 @@ export default function AdminNavbar() {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/signin");
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/signin");
+    }
   };
 
   return (
@@ -141,7 +143,7 @@ export default function AdminNavbar() {
             ))}
           </nav>
 
-          {/* Right */}
+          {/* Right Section */}
 
           <div
             className="
@@ -151,6 +153,7 @@ export default function AdminNavbar() {
             lg:flex
             "
           >
+            {/* Notifications */}
             <Link
               to="/admin/notifications"
               className="
@@ -160,11 +163,15 @@ export default function AdminNavbar() {
               transition
               hover:bg-white/10
               hover:text-[#d4af37]
+              relative
               "
             >
               <FaBell size={18} />
+              {/* Optional: Add notification badge */}
+              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
             </Link>
 
+            {/* Profile Link - Desktop */}
             <Link
               to="/admin/profile"
               className="
@@ -177,6 +184,7 @@ export default function AdminNavbar() {
               py-2
               transition
               hover:bg-white/10
+              hover:shadow-lg
               "
             >
               <FaUserCircle className="text-[#d4af37]" size={30} />
@@ -190,6 +198,7 @@ export default function AdminNavbar() {
               </div>
             </Link>
 
+            {/* Logout */}
             <button
               onClick={handleLogout}
               className="
@@ -206,7 +215,7 @@ export default function AdminNavbar() {
             </button>
           </div>
 
-          {/* Mobile */}
+          {/* Mobile Menu Button */}
 
           <button
             onClick={() => setOpen(!open)}
@@ -251,6 +260,7 @@ export default function AdminNavbar() {
         </div>
 
         <div className="p-5">
+          {/* User Info */}
           <div className="mb-8 flex items-center gap-3">
             <FaUserCircle size={50} className="text-[#d4af37]" />
 
@@ -263,6 +273,7 @@ export default function AdminNavbar() {
             </div>
           </div>
 
+          {/* Navigation Links */}
           <nav className="space-y-2">
             {menu.map((item) => (
               <NavLink
@@ -293,6 +304,7 @@ export default function AdminNavbar() {
               </NavLink>
             ))}
 
+            {/* Notifications - Mobile */}
             <NavLink
               to="/admin/notifications"
               onClick={() => setOpen(false)}
@@ -300,17 +312,38 @@ export default function AdminNavbar() {
             >
               <FaBell />
               Notifications
+              <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                0
+              </span>
             </NavLink>
 
+            {/* Profile - Mobile */}
             <NavLink
               to="/admin/profile"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-200 transition hover:bg-white/10"
+              className={({ isActive }) =>
+                `
+                flex
+                items-center
+                gap-3
+                rounded-xl
+                px-4
+                py-3
+                transition
+
+                ${
+                  isActive
+                    ? "bg-[#d4af37] text-[#1b2b26]"
+                    : "text-gray-200 hover:bg-white/10"
+                }
+                `
+              }
             >
               <FaUserCircle />
               Profile
             </NavLink>
 
+            {/* Logout - Mobile */}
             <button
               onClick={handleLogout}
               className="
@@ -336,6 +369,7 @@ export default function AdminNavbar() {
         </div>
       </div>
 
+      {/* Overlay */}
       {open && (
         <div
           onClick={() => setOpen(false)}

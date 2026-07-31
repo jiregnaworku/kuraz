@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = "https://kuraz-backend-sin2.onrender.com/api/notifications";
+//const API_URL = "http://localhost:5000/api/notifications";
 
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
@@ -29,6 +30,20 @@ export const getNotifications = async () => {
 export const markNotificationRead = async (id) => {
   const response = await axios.put(
     `${API_URL}/${id}/read`,
+    {},
+    getAuthHeader(),
+  );
+
+  return response.data;
+};
+
+// ==============================
+// MARK ALL NOTIFICATIONS AS READ
+// ==============================
+
+export const markAllAsRead = async () => {
+  const response = await axios.put(
+    `${API_URL}/mark-all-read`,
     {},
     getAuthHeader(),
   );
