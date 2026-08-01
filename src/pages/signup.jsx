@@ -2,9 +2,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaLock, FaUserPlus, FaUser } from "react-icons/fa";
 import { useState } from "react";
 import API from "../api/api";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -21,7 +23,7 @@ export default function Signup() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match");
+      setMessage(t("order.orderFailed"));
       return;
     }
 
@@ -39,13 +41,13 @@ export default function Signup() {
 
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
-      setMessage("Account created successfully");
+      setMessage(t("auth.createAccount"));
 
       setTimeout(() => {
         navigate("/signin");
       }, 1500);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Signup failed. Try again.");
+      setMessage(error.response?.data?.message || t("order.orderFailed"));
     } finally {
       setLoading(false);
     }
@@ -125,11 +127,11 @@ export default function Signup() {
             max-[480px]:text-3xl
             "
           >
-            Create Account
+            {t("auth.signupTitle")}
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-gray-300">
-            Join Kuraz Design and discover beautiful Ethiopian cultural fashion.
+            {t("auth.signupDesc")}
           </p>
         </div>
 
@@ -152,7 +154,7 @@ export default function Signup() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Full Name
+              {t("auth.fullName")}
             </label>
 
             <div
@@ -177,7 +179,7 @@ export default function Signup() {
                     fullName: e.target.value,
                   })
                 }
-                placeholder="Enter your full name"
+                placeholder={t("auth.fullName")}
                 className="
                 w-full
                 bg-transparent
@@ -195,7 +197,7 @@ export default function Signup() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Phone Number
+              {t("auth.phone")}
             </label>
 
             <div
@@ -236,7 +238,7 @@ export default function Signup() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Password
+              {t("auth.password")}
             </label>
 
             <div
@@ -259,7 +261,7 @@ export default function Signup() {
                     password: e.target.value,
                   })
                 }
-                placeholder="Create password"
+                placeholder={t("auth.password")}
                 className="
                 w-full
                 bg-transparent
@@ -277,7 +279,7 @@ export default function Signup() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Confirm Password
+              {t("auth.confirmPassword")}
             </label>
 
             <div
@@ -300,7 +302,7 @@ export default function Signup() {
                     confirmPassword: e.target.value,
                   })
                 }
-                placeholder="Confirm password"
+                placeholder={t("auth.confirmPassword")}
                 className="
                 w-full
                 bg-transparent
@@ -338,7 +340,7 @@ export default function Signup() {
           >
             <FaUserPlus />
 
-            {loading ? "Creating..." : "Create Account"}
+            {loading ? t("auth.creating") : t("auth.createAccount")}
           </button>
         </form>
 
@@ -349,7 +351,7 @@ export default function Signup() {
           text-gray-300
           "
         >
-          Already have an account?
+          {t("auth.noAccount")}
           <Link
             to="/signin"
             className="
@@ -359,7 +361,7 @@ export default function Signup() {
             hover:underline
             "
           >
-            Login
+            {t("auth.signIn")}
           </Link>
         </div>
       </div>

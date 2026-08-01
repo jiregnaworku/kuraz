@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import About from "../sections/about";
 import Collection from "../components/collection/Collection";
 import Contact from "../sections/contact";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useLanguage } from "../context/LanguageContext";
 
 const images = [
   "/assets/images/dress1.jpg",
@@ -28,6 +30,7 @@ export default function Home() {
   const [visible, setVisible] = useState(0);
   const [current, setCurrent] = useState(0);
   const [slides, setSlides] = useState([images[0], images[1]]);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -86,25 +89,24 @@ export default function Home() {
             md:translate-y-[15px]
           "
         >
-          {/* Small Title */}
+          <div className="mb-[18px] flex flex-col items-center gap-3 sm:gap-4">
+            <span
+              className="
+                inline-block
+                text-[15px]
+                font-semibold
+                uppercase
+                tracking-[6px]
+                text-[#d4af37]
+                md:text-[12px]
+                md:tracking-[4px]
+              "
+            >
+              {t("home.tagline")}
+            </span>
 
-          <span
-            className="
-              mb-[18px]
-              inline-block
-              text-[15px]
-              font-semibold
-              uppercase
-              tracking-[6px]
-              text-[#d4af37]
-              md:text-[12px]
-              md:tracking-[4px]
-            "
-          >
-            Ethiopian Cultural Fashion
-          </span>
-
-          {/* Main Title */}
+            <LanguageSwitcher className="sm:hidden" />
+          </div>
 
           <h1
             className="
@@ -117,10 +119,8 @@ export default function Home() {
               max-[480px]:tracking-[2px]
             "
           >
-            ባህል ውበት ነዉ
+            {t("home.title")}
           </h1>
-
-          {/* Brand */}
 
           <h2
             className="
@@ -130,10 +130,8 @@ export default function Home() {
               text-[#f2f2f2]
             "
           >
-            Kuraz Design
+            {t("home.brand")}
           </h2>
-
-          {/* Description */}
 
           <p
             className="
@@ -148,13 +146,8 @@ export default function Home() {
               max-[480px]:leading-[1.8]
             "
           >
-            Discover elegant Habesha cultural dresses crafted with Ethiopian
-            tradition, timeless beauty, and modern creativity. Every design is
-            carefully handmade to celebrate our rich cultural heritage while
-            bringing elegance and authenticity to every occasion.
+            {t("home.description")}
           </p>
-
-          {/* Buttons */}
 
           <div className="flex flex-wrap items-center justify-center gap-[18px] md:flex-col">
             <a
@@ -176,7 +169,7 @@ export default function Home() {
                 max-[480px]:w-[220px]
               "
             >
-              Explore Collection
+              {t("home.explore")}
             </a>
 
             <a
@@ -200,11 +193,9 @@ export default function Home() {
                 max-[480px]:w-[220px]
               "
             >
-              Book Designer
+              {t("home.book")}
             </a>
           </div>
-
-          {/* Gold Line */}
 
           <div className="mx-auto mt-10 h-[3px] w-[90px] rounded-full bg-[#d4af37]" />
         </div>

@@ -2,9 +2,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaLock, FaSignInAlt } from "react-icons/fa";
 import { useState } from "react";
 import API from "../api/api";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Signin() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [formData, setFormData] = useState({
     phone: "",
@@ -37,7 +39,7 @@ export default function Signin() {
 
       window.dispatchEvent(new Event("storage"));
 
-      setMessage("Login successful");
+      setMessage(t("auth.signinTitle"));
 
       setTimeout(() => {
         const user = response.data.user;
@@ -69,10 +71,7 @@ export default function Signin() {
         }
       }, 1000);
     } catch (error) {
-      setMessage(
-        error.response?.data?.message ||
-          "Login failed. Check your information.",
-      );
+      setMessage(error.response?.data?.message || t("order.orderFailed"));
     } finally {
       setLoading(false);
     }
@@ -152,12 +151,11 @@ export default function Signin() {
             max-[480px]:text-3xl
             "
           >
-            Welcome Back
+            {t("auth.signinTitle")}
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-gray-300">
-            Login to your Kuraz Design account and continue your fashion
-            journey.
+            {t("auth.signinDesc")}
           </p>
         </div>
 
@@ -180,7 +178,7 @@ export default function Signin() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Phone Number
+              {t("auth.phone")}
             </label>
 
             <div
@@ -223,7 +221,7 @@ export default function Signin() {
 
           <div>
             <label className="mb-2 block text-sm font-medium text-white">
-              Password
+              {t("auth.password")}
             </label>
 
             <div
@@ -248,7 +246,7 @@ export default function Signin() {
                     password: e.target.value,
                   })
                 }
-                placeholder="Enter password"
+                placeholder={t("auth.password")}
                 className="
                 w-full
                 bg-transparent
@@ -271,7 +269,7 @@ export default function Signin() {
               hover:underline
               "
             >
-              Forgot Password?
+              {t("auth.forgot")}
             </a>
           </div>
 
@@ -300,7 +298,7 @@ export default function Signin() {
           >
             <FaSignInAlt />
 
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t("auth.signingIn") : t("auth.signIn")}
           </button>
         </form>
 
@@ -311,7 +309,7 @@ export default function Signin() {
           text-gray-300
           "
         >
-          Don't have an account?
+          {t("auth.noAccount")}
           <Link
             to="/signup"
             className="
@@ -321,7 +319,7 @@ export default function Signin() {
             hover:underline
             "
           >
-            Create Account
+            {t("auth.signupLink")}
           </Link>
         </div>
       </div>

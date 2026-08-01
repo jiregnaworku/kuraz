@@ -1,7 +1,9 @@
 import { FaHouse, FaCircleInfo, FaShirt, FaEnvelope } from "react-icons/fa6";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer
@@ -30,8 +32,6 @@ export default function Footer() {
       max-[340px]:pb-[18px]
       "
     >
-      {/* Gold Background Glow */}
-
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -58,8 +58,6 @@ export default function Footer() {
         max-[480px]:gap-[18px]
         "
       >
-        {/* Brand */}
-
         <div
           className="
           max-lg:col-span-2
@@ -100,14 +98,10 @@ export default function Footer() {
             max-[340px]:text-[13px]
             "
           >
-            We design and create beautiful Ethiopian cultural dresses with
-            elegance, tradition, and modern craftsmanship. Delivering quality
-            fashion across Ethiopia and around the world.
+            {t("footer.description")}
           </p>
         </div>
 
-        {/* Quick Links */}
-
         <div
           className="
           flex flex-col gap-[15px]
@@ -126,21 +120,27 @@ export default function Footer() {
           "
         >
           <h3 className="mb-6 text-[clamp(20px,2vw,24px)] font-semibold text-[#d4af37]">
-            Quick Links
+            {t("footer.quickLinks")}
             <span className="mt-2 block h-[2px] w-[45px] bg-[#d4af37]" />
           </h3>
 
-          <FooterLink href="#home" icon={<FaHouse />} text="Home" />
-          <FooterLink href="#about" icon={<FaCircleInfo />} text="About Us" />
-          <FooterLink href="#collection" icon={<FaShirt />} text="Collection" />
+          <FooterLink href="#home" icon={<FaHouse />} text={t("nav.home")} />
+          <FooterLink
+            href="#about"
+            icon={<FaCircleInfo />}
+            text={t("nav.about")}
+          />
+          <FooterLink
+            href="#collection"
+            icon={<FaShirt />}
+            text={t("nav.collection")}
+          />
           <FooterLink
             href="#contact-section"
             icon={<FaEnvelope />}
-            text="Contact"
+            text={t("nav.contact")}
           />
         </div>
-
-        {/* Contact */}
 
         <div
           className="
@@ -160,7 +160,7 @@ export default function Footer() {
           "
         >
           <h3 className="mb-6 text-[clamp(20px,2vw,24px)] font-semibold text-[#d4af37]">
-            Contact
+            {t("footer.contact")}
             <span className="mt-2 block h-[2px] w-[45px] bg-[#d4af37]" />
           </h3>
 
@@ -184,8 +184,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom */}
-
       <div
         className="
         relative z-10
@@ -204,7 +202,7 @@ export default function Footer() {
         max-[480px]:leading-[1.7]
         "
       >
-        © {year} Kuraz Design. All Rights Reserved.
+        © {year} Kuraz Design. {t("footer.rights")}
       </div>
     </footer>
   );

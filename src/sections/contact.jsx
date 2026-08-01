@@ -1,19 +1,23 @@
+import { useLanguage } from "../context/LanguageContext";
+
 export default function Contact() {
+  const { t } = useLanguage();
+
   const contacts = [
     {
-      title: "Call Us",
+      title: t("contact.callUs"),
       icon: "/assets/icons/phone.png",
       value: "+251 937 398 157",
       link: "tel:+251937398157",
     },
     {
-      title: "Telegram Channel",
+      title: t("contact.telegramChannel"),
       icon: "/assets/icons/telegram.png",
       value: "t.me/habesha3661",
       link: "https://t.me/habesha3661",
     },
     {
-      title: "Telegram Support",
+      title: t("contact.telegramSupport"),
       icon: "/assets/icons/telegram.png",
       value: "@habesha3661",
       link: "https://t.me/habesha3661",
@@ -51,8 +55,6 @@ export default function Contact() {
         max-[480px]:rounded-[18px]
         "
       >
-        {/* Tag */}
-
         <span
           className="
           mb-5
@@ -66,10 +68,8 @@ export default function Contact() {
           text-white
           "
         >
-          Contact Us
+          {t("contact.tag")}
         </span>
-
-        {/* Heading */}
 
         <h2
           className="
@@ -82,10 +82,8 @@ export default function Contact() {
           max-[480px]:text-[1.8rem]
           "
         >
-          We're Here to Help
+          {t("contact.heading")}
         </h2>
-
-        {/* Description */}
 
         <p
           className="
@@ -95,12 +93,8 @@ export default function Contact() {
           text-[#c7d7d3]
           "
         >
-          Have questions about our traditional Ethiopian clothing or want to
-          place an order? Contact us directly through phone or Telegram. We are
-          happy to assist you and respond as quickly as possible.
+          {t("contact.description")}
         </p>
-
-        {/* Contact Cards */}
 
         <div className="flex flex-col gap-[22px]">
           {contacts.map((item, index) => (
@@ -127,8 +121,6 @@ export default function Contact() {
               max-[480px]:text-center
               "
             >
-              {/* Icon */}
-
               <div
                 className="
                 flex
@@ -158,8 +150,6 @@ export default function Contact() {
                   "
                 />
               </div>
-
-              {/* Content */}
 
               <div
                 className="

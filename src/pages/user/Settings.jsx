@@ -73,22 +73,25 @@ export default function Settings() {
   return (
     <div
       className="
-      rounded-3xl
-      bg-white
-      p-6
-      shadow-xl
+      rounded-[1.75rem]
+      border
+      border-white/70
+      bg-white/90
+      p-5
+      shadow-[0_18px_50px_rgba(36,49,44,0.08)]
       "
     >
       <div
         className="
-        mb-8
+        mb-7
         border-b
+        border-gray-100
         pb-4
         "
       >
         <h1
           className="
-          text-2xl
+          text-xl
           font-bold
           text-[#24312c]
           "
@@ -124,8 +127,8 @@ export default function Settings() {
       <div className="mb-10">
         <h2
           className="
-          mb-5
-          text-xl
+          mb-4
+          text-lg
           font-bold
           text-[#24312c]
           "
@@ -160,16 +163,16 @@ export default function Settings() {
         <button
           onClick={handleUpdateProfile}
           className="
-          mt-4
+          mt-3
           flex
           w-full
           items-center
           justify-center
-          gap-3
-          rounded-xl
+          gap-2.5
+          rounded-2xl
           bg-[#d4af37]
-          py-4
-          font-bold
+          py-3.5
+          font-semibold
           text-white
           hover:bg-[#b89025]
           "
@@ -184,8 +187,8 @@ export default function Settings() {
       <div>
         <h2
           className="
-          mb-5
-          text-xl
+          mb-4
+          text-lg
           font-bold
           text-[#24312c]
           "
@@ -223,16 +226,16 @@ export default function Settings() {
         <button
           onClick={handleChangePassword}
           className="
-          mt-4
+          mt-3
           flex
           w-full
           items-center
           justify-center
-          gap-3
-          rounded-xl
+          gap-2.5
+          rounded-2xl
           bg-[#24312c]
-          py-4
-          font-bold
+          py-3.5
+          font-semibold
           text-white
           hover:bg-[#18221f]
           "
@@ -252,6 +255,7 @@ function Input({ icon, label, name, value, onChange, type = "text" }) {
         className="
         mb-2
         block
+        text-sm
         font-semibold
         text-[#24312c]
         "
@@ -264,9 +268,11 @@ function Input({ icon, label, name, value, onChange, type = "text" }) {
         flex
         items-center
         gap-3
-        rounded-xl
+        rounded-2xl
         border
+        border-gray-200
         px-4
+        py-1
         "
       >
         <span
@@ -285,6 +291,8 @@ function Input({ icon, label, name, value, onChange, type = "text" }) {
           className="
           w-full
           py-3
+          text-sm
+          text-[#24312c]
           outline-none
           "
         />

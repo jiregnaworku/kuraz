@@ -1,4 +1,4 @@
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { useLocation, Link, Outlet } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -6,12 +6,12 @@ import {
   FaMapMarkerAlt,
   FaHome,
   FaShoppingBag,
-  FaHeart,
   FaCommentDots,
-  FaStar,
   FaBars,
   FaBell,
   FaTimes,
+  FaCog,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { useState } from "react";
@@ -26,27 +26,54 @@ export default function Profile() {
   // Only true on /profile, not /profile/orders etc.
   const isMainProfile = location.pathname === "/profile";
 
+  // Get page title based on route
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === "/profile") return "Dashboard";
+    if (path === "/profile/orders") return "My Orders";
+    if (path === "/profile/messages") return "Messages";
+    if (path === "/profile/notifications") return "Notifications";
+    if (path === "/profile/settings") return "Settings";
+    return "";
+  };
+
+  // Get page icon based on route
+  const getPageIcon = () => {
+    const path = location.pathname;
+    if (path === "/profile") return <FaUser className="text-[#d4af37]" />;
+    if (path === "/profile/orders")
+      return <FaShoppingBag className="text-[#d4af37]" />;
+    if (path === "/profile/messages")
+      return <FaCommentDots className="text-[#d4af37]" />;
+    if (path === "/profile/notifications")
+      return <FaBell className="text-[#d4af37]" />;
+    if (path === "/profile/settings")
+      return <FaCog className="text-[#d4af37]" />;
+    return null;
+  };
+
   return (
     <section
       className="
       min-h-screen
-      bg-gradient-to-br
-      from-[#f8f4eb]
-      via-[#fcfbf8]
-      to-[#e8d8aa]
+      bg-[radial-gradient(circle_at_top,_rgba(212,175,55,0.12),_transparent_35%),linear-gradient(135deg,_#f8f4eb_0%,_#fcfbf8_45%,_#eef3ee_100%)]
       relative
+      overflow-hidden
       "
     >
-      {/* Back to Home Button */}
-      <div className="absolute left-4 top-4 z-10 sm:left-6 sm:top-6">
+      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-[#d4af37]/10 blur-3xl"></div>
+      <div className="pointer-events-none absolute -right-24 top-1/2 h-80 w-80 rounded-full bg-[#24312c]/5 blur-3xl"></div>
+
+      {/* Back to Home Button - Mobile only */}
+      <div className="absolute left-4 top-4 z-10 sm:left-6 sm:top-6 lg:hidden">
         <Link
           to="/#home"
           className="
             group flex items-center gap-2 rounded-full 
-            bg-white/80 px-4 py-2 text-sm font-medium 
-            text-[#24312c] shadow-lg backdrop-blur-sm
+            border border-white/70 bg-white/85 px-4 py-2 text-sm font-medium 
+            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
             transition-all duration-300 hover:bg-white 
-            hover:shadow-xl hover:scale-105
+            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
             sm:px-5 sm:py-2.5 sm:text-base
           "
         >
@@ -58,16 +85,33 @@ export default function Profile() {
         </Link>
       </div>
 
+      {/* Back to Home Button - Desktop only */}
+      <div className="absolute left-6 top-6 z-10 hidden lg:block">
+        <Link
+          to="/#home"
+          className="
+            group flex items-center gap-2 rounded-full 
+            border border-white/70 bg-white/85 px-5 py-2.5 text-sm font-medium 
+            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
+            transition-all duration-300 hover:bg-white 
+            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
+          "
+        >
+          <FaHome className="text-[#d4af37] transition-transform duration-300 group-hover:scale-110" />
+          <span>Home</span>
+        </Link>
+      </div>
+
       {/* Mobile Hamburger Menu Button */}
       <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6 lg:hidden">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="
             group flex items-center gap-2 rounded-full 
-            bg-white/80 px-4 py-2 text-sm font-medium 
-            text-[#24312c] shadow-lg backdrop-blur-sm
+            border border-white/70 bg-white/85 px-4 py-2 text-sm font-medium 
+            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
             transition-all duration-300 hover:bg-white 
-            hover:shadow-xl hover:scale-105
+            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
           "
         >
           {mobileMenuOpen ? (
@@ -263,7 +307,7 @@ export default function Profile() {
           {/* Mobile Menu Footer */}
           <div className="border-t border-gray-100 p-4">
             <p className="text-center text-xs text-gray-400">
-              © 2024 Your Store
+              © 2026 Your Store
             </p>
           </div>
         </div>
@@ -275,14 +319,17 @@ export default function Profile() {
         flex
         max-w-7xl
         flex-col
-        gap-6
+        gap-5
         px-4
-        py-6
+        pt-20
+        pb-5
 
         sm:px-6
+        sm:pt-24
         lg:flex-row
         lg:px-8
-        lg:py-8
+        lg:pt-10
+        lg:pb-10
         "
       >
         {/* Main Content - Now on the Left */}
@@ -291,40 +338,56 @@ export default function Profile() {
           min-h-[80vh]
           flex-1
           overflow-hidden
-          rounded-3xl
+          rounded-[2rem]
           border
-          border-white/10
-          bg-white/25
-          p-5
-          shadow-[0_20px_60px_rgba(0,0,0,0.08)]
-          backdrop-blur-xl
+          border-white/30
+          bg-white/55
+          p-4
+          shadow-[0_24px_80px_rgba(36,49,44,0.12)]
+          backdrop-blur-2xl
 
-          sm:p-7
+          sm:p-6
           lg:p-8
           lg:order-1
           "
         >
+          {/* Page Header - Show on all pages except main profile */}
+          {!isMainProfile && (
+            <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f8f4eb] text-lg">
+                {getPageIcon()}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-[#24312c]">
+                  {getPageTitle()}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {getPageTitle()} / Profile
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Dashboard Home Only */}
-
-          {isMainProfile && (
+          {isMainProfile ? (
             <>
-              {/* Welcome Section with Decorative Elements */}
-              <div className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-r from-[#24312c] to-[#3a4a42] p-6 sm:p-8">
+              {/* Welcome Section with Decorative Elements - Added mt-2 for spacing */}
+              <div className="relative mb-8 mt-2 overflow-hidden rounded-[1.75rem] bg-gradient-to-r from-[#24312c] via-[#2f3c36] to-[#435049] p-5 shadow-xl sm:p-7 lg:mb-7">
                 {/* Decorative Circles */}
-                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d4af37]/10"></div>
-                <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-[#d4af37]/5"></div>
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d4af37]/10 blur-2xl"></div>
+                <div className="absolute -bottom-10 -left-20 h-48 w-48 rounded-full bg-[#d4af37]/5 blur-2xl"></div>
 
-                <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
                   <div
                     className="
                     flex
-                    h-24
-                    w-24
+                    h-20
+                    w-20
                     items-center
                     justify-center
                     rounded-full
                     bg-gradient-to-br from-[#d4af37] to-[#b88f1d]
-                    text-4xl
+                    text-3xl
                     text-white
                     shadow-lg
                     ring-4
@@ -337,16 +400,16 @@ export default function Profile() {
                   <div className="flex-1">
                     <h1
                       className="
-                      text-3xl
+                        text-2xl
                       font-bold
                       text-white
-                      sm:text-4xl
+                        sm:text-3xl
                       "
                     >
                       Welcome back, {user?.fullName || "Customer"}! 👋
                     </h1>
 
-                    <p className="mt-2 text-gray-300">
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
                       Manage your account, orders and messages from here.
                     </p>
                   </div>
@@ -358,36 +421,8 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Stats Cards */}
-              <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <StatCard
-                  icon={<FaShoppingBag />}
-                  label="Total Orders"
-                  value="12"
-                  color="from-blue-500 to-blue-600"
-                />
-                <StatCard
-                  icon={<FaHeart />}
-                  label="Wishlist"
-                  value="8"
-                  color="from-red-500 to-rose-600"
-                />
-                <StatCard
-                  icon={<FaCommentDots />}
-                  label="Reviews"
-                  value="5"
-                  color="from-green-500 to-emerald-600"
-                />
-                <StatCard
-                  icon={<FaStar />}
-                  label="Rating"
-                  value="4.8"
-                  color="from-yellow-500 to-amber-600"
-                />
-              </div>
-
               {/* User Information Grid */}
-              <div className="grid gap-5 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2">
                 <InfoCard
                   icon={<FaUser className="text-[#d4af37]" />}
                   title="Full Name"
@@ -417,11 +452,12 @@ export default function Profile() {
                 />
               </div>
             </>
+          ) : (
+            /* Child Routes - Orders, Messages, Notifications, Settings */
+            <div className="space-y-4">
+              <Outlet />
+            </div>
           )}
-
-          {/* Child Pages */}
-
-          <Outlet />
         </main>
 
         {/* Sidebar - Now on the Right (Desktop Only) */}
@@ -451,12 +487,12 @@ function InfoCard({ icon, title, value, gradient }) {
       group
       relative
       overflow-hidden
-      rounded-2xl
+      rounded-[1.5rem]
       border
-      border-gray-100
-      bg-white/100
-      p-6
-      shadow-sm
+      border-white/70
+      bg-white/90
+      p-5
+      shadow-[0_12px_40px_rgba(36,49,44,0.08)]
       transition-all
       duration-300
       hover:-translate-y-1
@@ -483,13 +519,13 @@ function InfoCard({ icon, title, value, gradient }) {
         <div
           className="
           flex
-          h-12
-          w-12
+          h-11
+          w-11
           items-center
           justify-center
-          rounded-xl
+          rounded-2xl
           bg-[#f8f4eb]
-          text-xl
+          text-lg
           transition-all
           duration-300
           group-hover:bg-[#d4af37]/10
@@ -501,6 +537,7 @@ function InfoCard({ icon, title, value, gradient }) {
 
         <h3
           className="
+          text-sm
           font-semibold
           text-[#24312c]
           "
@@ -509,7 +546,7 @@ function InfoCard({ icon, title, value, gradient }) {
         </h3>
       </div>
 
-      <p className="break-words text-gray-600 group-hover:text-[#24312c] transition-colors duration-300">
+      <p className="break-words text-sm leading-6 text-gray-600 group-hover:text-[#24312c] transition-colors duration-300">
         {value || "Not available"}
       </p>
 
@@ -518,29 +555,3 @@ function InfoCard({ icon, title, value, gradient }) {
     </div>
   );
 }
-
-function StatCard({ icon, label, value, color }) {
-  return (
-    <div
-      className="
-      rounded-2xl
-      bg-white/90
-      p-4
-      text-center
-      shadow-sm
-      transition-all
-      duration-300
-      hover:-translate-y-1
-      hover:shadow-lg
-      backdrop-blur-sm
-      "
-    >
-      <div className={`text-2xl text-${color} mb-2`}>{icon}</div>
-      <div className="text-2xl font-bold text-[#24312c]">{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
-    </div>
-  );
-}
-
-// Add missing imports
-import { FaCog, FaSignOutAlt } from "react-icons/fa";

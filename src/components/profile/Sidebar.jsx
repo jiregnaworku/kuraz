@@ -104,19 +104,19 @@ export default function Sidebar() {
         z-[1000]
 
         flex
-        h-12
-        w-12
+        h-11
+        w-11
         items-center
         justify-center
 
         rounded-full
 
-        bg-[#24312c]
+        bg-[#24312c]/95
 
-        text-xl
+        text-lg
         text-[#d4af37]
 
-        shadow-lg
+        shadow-[0_12px_30px_rgba(36,49,44,0.25)]
 
         lg:hidden
         "
@@ -148,11 +148,11 @@ export default function Sidebar() {
         z-[999]
 
         h-screen
-        w-72
+        w-80
 
-        bg-[#24312c]
+        bg-[linear-gradient(180deg,_#24312c_0%,_#1b2521_100%)]
 
-        p-6
+        p-5
 
         shadow-2xl
 
@@ -162,9 +162,9 @@ export default function Sidebar() {
 
         lg:static
         lg:h-fit
-        lg:rounded-3xl
+        lg:rounded-[1.75rem]
         lg:translate-x-0
-        lg:shadow-lg
+        lg:shadow-[0_18px_50px_rgba(36,49,44,0.16)]
 
         ${open ? "translate-x-0" : "translate-x-full"}
 
@@ -197,18 +197,20 @@ export default function Sidebar() {
             className="
             mx-auto
             flex
-            h-20
-            w-20
+            h-18
+            w-18
 
             items-center
             justify-center
 
             rounded-full
 
-            bg-white
+            bg-white/95
 
-            text-3xl
+            text-2xl
             text-[#d4af37]
+
+            shadow-lg
 
             "
           >
@@ -218,7 +220,7 @@ export default function Sidebar() {
           <h2
             className="
             mt-4
-            text-xl
+            text-lg
             font-bold
             text-white
             "
@@ -229,8 +231,8 @@ export default function Sidebar() {
           <p
             className="
             mt-1
-            text-sm
-            text-gray-300
+            text-xs
+            text-gray-300/90
             "
           >
             Manage your account
@@ -240,7 +242,7 @@ export default function Sidebar() {
         {/* MENU */}
         <nav
           className="
-          space-y-3
+          space-y-2.5
           "
         >
           {menuItems.map((item) => (
@@ -253,12 +255,12 @@ export default function Sidebar() {
                 `
                 flex
                 items-center
-                gap-4
+                gap-3
 
-                rounded-xl
+                rounded-2xl
 
                 px-4
-                py-3
+                py-3.5
 
                 font-medium
 
@@ -266,8 +268,8 @@ export default function Sidebar() {
 
                 ${
                   isActive
-                    ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
+                    ? "bg-[#d4af37] text-white shadow-[0_10px_25px_rgba(212,175,55,0.28)]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-white"
                 }
 
                 `
@@ -292,12 +294,12 @@ export default function Sidebar() {
             flex
             w-full
             items-center
-            gap-4
+            gap-3
 
-            rounded-xl
+            rounded-2xl
 
             px-4
-            py-3
+            py-3.5
 
             font-medium
 

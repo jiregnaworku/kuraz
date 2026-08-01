@@ -8,10 +8,11 @@ import {
 } from "react-icons/fa";
 
 import { getProduct } from "../api/productApi";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ProductDetails() {
   const { id } = useParams();
-
+  const { t } = useLanguage();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
@@ -34,7 +35,7 @@ export default function ProductDetails() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-xl">
-        Loading product...
+        {t("product.loading")}
       </div>
     );
   }
@@ -42,291 +43,97 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <div className="flex min-h-screen items-center justify-center text-xl">
-        Product not found.
+        {t("product.notFound")}
       </div>
     );
   }
 
   return (
-    <section
-      className="
-      min-h-screen
-      bg-[#204445]
-      px-4
-      pb-20
-      pt-28
-      sm:px-6
-      lg:px-10
-      "
-    >
+    <section className="min-h-screen bg-[#204445] px-4 pb-20 pt-28 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-7xl">
-        {/* Back Button */}
-
         <Link
           to="/"
-          className="
-          mb-8
-          inline-flex
-          items-center
-          gap-2
-          rounded-xl
-          bg-[#8d5a5a]
-          px-5
-          py-3
-          text-sm
-          font-semibold
-          text-white
-          transition
-          hover:bg-[#487462]
-          sm:text-base
-          "
+          className="mb-8 inline-flex items-center gap-2 rounded-xl bg-[#8d5a5a] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#487462] sm:text-base"
         >
           <FaArrowLeft />
-          Back
+          {t("product.back")}
         </Link>
 
-        <div
-          className="
-          grid
-          gap-8
-          lg:grid-cols-2
-          lg:gap-14
-          "
-        >
-          {/* IMAGE SECTION */}
-
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
           <div>
-            <div
-              className="
-              overflow-hidden
-              rounded-3xl
-              bg-white
-              shadow-lg
-              "
-            >
+            <div className="overflow-hidden rounded-3xl bg-white shadow-lg">
               <img
                 src={product.images?.[activeImage]}
                 alt={product.name}
-                className="
-                h-[350px]
-                w-full
-                object-cover
-
-                sm:h-[450px]
-
-                lg:h-[550px]
-                "
+                className="h-[350px] w-full object-cover sm:h-[450px] lg:h-[550px]"
               />
             </div>
 
-            {/* Thumbnails */}
-
-            <div
-              className="
-              mt-5
-              flex
-              max-w-full
-              gap-3
-              overflow-x-auto
-              pb-2
-              "
-            >
+            <div className="mt-5 flex max-w-full gap-3 overflow-x-auto pb-2">
               {product.images?.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveImage(index)}
-                  className={`
-                  flex-shrink-0
-                  overflow-hidden
-                  rounded-xl
-                  border-2
-
-                  ${
-                    activeImage === index
-                      ? "border-[#ccc9c0]"
-                      : "border-transparent"
-                  }
-
-                  `}
+                  className={`flex-shrink-0 overflow-hidden rounded-xl border-2 ${activeImage === index ? "border-[#ccc9c0]" : "border-transparent"}`}
                 >
                   <img
                     src={img}
                     alt=""
-                    className="
-                    h-20
-                    w-20
-                    object-cover
-
-                    sm:h-24
-                    sm:w-24
-                    "
+                    className="h-20 w-20 object-cover sm:h-24 sm:w-24"
                   />
                 </button>
               ))}
             </div>
           </div>
 
-          {/* PRODUCT INFO */}
-
-          <div
-            className="
-            flex
-            flex-col
-            justify-center
-            "
-          >
-            <span
-              className="
-              w-fit
-              rounded-full
-              bg-[#a74da2]
-              px-4
-              py-2
-              text-sm
-              font-semibold
-              text-white
-              "
-            >
+          <div className="flex flex-col justify-center">
+            <span className="w-fit rounded-full bg-[#a74da2] px-4 py-2 text-sm font-semibold text-white">
               {product.category}
             </span>
 
-            <h1
-              className="
-              mt-5
-              text-3xl
-              font-bold
-              leading-tight
-              text-[#ffffff]
-
-              sm:text-4xl
-
-              lg:text-5xl
-              "
-            >
+            <h1 className="mt-5 text-3xl font-bold leading-tight text-[#ffffff] sm:text-4xl lg:text-5xl">
               {product.name}
             </h1>
 
-            <h2
-              className="
-              mt-5
-              text-2xl
-              font-bold
-              text-[#ffffff]
-
-              sm:text-3xl
-              "
-            >
+            <h2 className="mt-5 text-2xl font-bold text-[#ffffff] sm:text-3xl">
               {product.price} ETB
             </h2>
 
-            <p
-              className="
-              mt-6
-              text-sm
-              leading-7
-              text-white
-
-              sm:text-base
-              "
-            >
+            <p className="mt-6 text-sm leading-7 text-white sm:text-base">
               {product.description}
             </p>
 
-            {/* Details */}
-
-            <div
-              className="
-              mt-7
-              space-y-3
-              rounded-2xl
-              bg-gray-500
-              p-5
-              shadow-sm
-              "
-            >
+            <div className="mt-7 space-y-3 rounded-2xl bg-gray-500 p-5 shadow-sm">
               <p>
-                <strong>Stock:</strong> {product.stock}
+                <strong>{t("product.stock")}:</strong> {product.stock}
               </p>
 
               <p>
-                <strong>Status:</strong> {product.status}
+                <strong>{t("product.status")}:</strong> {product.status}
               </p>
 
               <p>
-                <strong>Category:</strong> {product.category}
+                <strong>{t("product.category")}:</strong> {product.category}
               </p>
             </div>
 
-            {/* ACTION BUTTONS */}
-
-            <div
-              className="
-              mt-8
-              flex
-              flex-col
-              gap-3
-
-              sm:flex-row
-              sm:flex-wrap
-              "
-            >
-              <button
-                className="
-                flex
-                items-center
-                justify-center
-                gap-2
-                rounded-xl
-                border
-                border-red-100
-                px-6
-                py-3
-                transition
-                hover:bg-red-100
-                "
-              >
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button className="flex items-center justify-center gap-2 rounded-xl border border-red-100 px-6 py-3 transition hover:bg-red-100">
                 <FaHeart />
-                Like
+                {t("product.like")}
               </button>
 
-              <button
-                className="
-                flex
-                items-center
-                justify-center
-                gap-2
-                rounded-xl
-                border
-                border-blue-100
-                px-6
-                py-3
-                transition
-                hover:bg-gray-100
-                "
-              >
+              <button className="flex items-center justify-center gap-2 rounded-xl border border-blue-100 px-6 py-3 transition hover:bg-gray-100">
                 <FaShareAlt />
-                Share
+                {t("product.share")}
               </button>
 
               <Link
                 to={`/order/${product._id}`}
-                className="
-                flex
-                items-center
-                justify-center
-                gap-3
-                rounded-xl
-                bg-[#2c2715]
-                px-8
-                py-3
-                font-bold
-                text-white
-                transition
-                hover:bg-[#b88b21]
-                "
+                className="flex items-center justify-center gap-3 rounded-xl bg-[#2c2715] px-8 py-3 font-bold text-white transition hover:bg-[#b88b21]"
               >
                 <FaShoppingBag />
-                Order Now
+                {t("product.orderNow")}
               </Link>
             </div>
           </div>

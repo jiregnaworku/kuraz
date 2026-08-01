@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { FaUserCircle } from "react-icons/fa";
+import { useLanguage } from "../context/LanguageContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useLanguage();
 
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
@@ -135,19 +138,24 @@ export default function Navbar() {
           lg:p-0
           "
         >
-          <NavItem text="Home" link="/#home" hash close={closeMenu} />
-
-          <NavItem text="About" link="/#about" hash close={closeMenu} />
+          <NavItem text={t("nav.home")} link="/#home" hash close={closeMenu} />
 
           <NavItem
-            text="Collection"
+            text={t("nav.about")}
+            link="/#about"
+            hash
+            close={closeMenu}
+          />
+
+          <NavItem
+            text={t("nav.collection")}
             link="/#collection"
             hash
             close={closeMenu}
           />
 
           <NavItem
-            text="Contact"
+            text={t("nav.contact")}
             link="/#contact-section"
             hash
             close={closeMenu}
@@ -157,14 +165,18 @@ export default function Navbar() {
 
           {!user && (
             <>
-              <NavItem text="Login" link="/signin" close={closeMenu} />
+              <NavItem text={t("nav.login")} link="/signin" close={closeMenu} />
             </>
           )}
 
           {/* ADMIN */}
 
           {user?.role === "admin" && (
-            <NavItem text="Admin Dashboard" link="/admin" close={closeMenu} />
+            <NavItem
+              text={t("nav.adminDashboard")}
+              link="/admin"
+              close={closeMenu}
+            />
           )}
 
           {/* LOGOUT */}
@@ -186,7 +198,7 @@ export default function Navbar() {
               lg:p-0
               "
             >
-              Sign Out
+              {t("nav.signOut")}
             </button>
           )}
         </div>
@@ -220,7 +232,7 @@ export default function Navbar() {
         {user && user.role !== "admin" && (
           <Link
             to="/profile"
-            title="My Profile"
+            title={t("nav.profile")}
             className="
             flex
             items-center
@@ -241,6 +253,10 @@ export default function Navbar() {
             />
           </Link>
         )}
+
+        {/* Language Switcher */}
+
+        <LanguageSwitcher className="sm:inline-flex hidden" />
 
         {/* Mobile Menu */}
 

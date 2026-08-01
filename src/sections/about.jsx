@@ -1,16 +1,20 @@
+import { useLanguage } from "../context/LanguageContext";
+
 export default function About() {
+  const { t } = useLanguage();
+
   const features = [
     {
-      title: "Worldwide",
-      description: "Global delivery service",
+      title: t("about.worldwide"),
+      description: t("about.worldwideDesc"),
     },
     {
-      title: "Quality",
-      description: "Premium cultural designs",
+      title: t("about.quality"),
+      description: t("about.qualityDesc"),
     },
     {
-      title: "Heritage",
-      description: "Tradition in every thread",
+      title: t("about.heritage"),
+      description: t("about.heritageDesc"),
     },
   ];
 
@@ -41,8 +45,6 @@ export default function About() {
         max-lg:gap-[50px]
         "
       >
-        {/* Image */}
-
         <div
           className="
           overflow-hidden
@@ -70,8 +72,6 @@ export default function About() {
           />
         </div>
 
-        {/* Content */}
-
         <div className="max-lg:text-center">
           <span
             className="
@@ -85,7 +85,7 @@ export default function About() {
             text-white
             "
           >
-            Our Story
+            {t("about.story")}
           </span>
 
           <h2
@@ -99,7 +99,7 @@ export default function About() {
             max-[480px]:text-[32px]
             "
           >
-            ባህል ውበት ነዉ
+            {t("about.title")}
           </h2>
 
           <h3
@@ -112,7 +112,7 @@ export default function About() {
             max-md:text-[25px]
             "
           >
-            Kuraz Design
+            {t("about.brand")}
           </h3>
 
           <p
@@ -125,9 +125,7 @@ export default function About() {
             max-[480px]:text-[15px]
             "
           >
-            At Kuraz Design, we deeply honor Ethiopia's rich cultural heritage.
-            Our mission is to bring traditional Ethiopian attire to life while
-            continuously meeting the evolving needs of our customers.
+            {t("about.paragraph1")}
           </p>
 
           <p
@@ -140,10 +138,7 @@ export default function About() {
             max-[480px]:text-[15px]
             "
           >
-            Inspired by the beauty and craftsmanship of our ancestors, every
-            design represents culture, identity, and timeless Ethiopian fashion.
-            We preserve the elegance of tradition while combining it with modern
-            creativity.
+            {t("about.paragraph2")}
           </p>
 
           <p
@@ -156,13 +151,8 @@ export default function About() {
             max-[480px]:text-[15px]
             "
           >
-            Through customer feedback, appreciation, and collaboration, we
-            remain committed to delivering professional service, high-quality
-            designs, and beautiful clothing experiences for customers around the
-            world.
+            {t("about.paragraph3")}
           </p>
-
-          {/* Features */}
 
           <div
             className="

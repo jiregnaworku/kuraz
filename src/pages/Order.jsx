@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import { getProduct } from "../api/productApi";
 import { createOrder } from "../api/OrderApi";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Order() {
   const { id } = useParams();
@@ -32,6 +33,7 @@ export default function Order() {
 
   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
   const savedUser = JSON.parse(localStorage.getItem("user"));
+  const { t } = useLanguage();
 
   const [formData, setFormData] = useState({
     quantity: 1,
@@ -53,14 +55,14 @@ export default function Order() {
         setStockError(false);
       } catch (error) {
         console.error("Error loading product:", error);
-        alert("Failed to load product");
+        alert(t("order.loadFailed"));
       } finally {
         setLoading(false);
       }
     };
 
     loadProduct();
-  }, [id]);
+  }, [id, t]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,7 +88,7 @@ export default function Order() {
 
     // Validate quantity
     if (formData.quantity > product.stock) {
-      alert(`Only ${product.stock} items available in stock`);
+      alert(`${product.stock} ${t("order.onlyStock")}`);
       return;
     }
 
@@ -95,22 +97,22 @@ export default function Order() {
     // User is not logged in
     if (!token) {
       localStorage.setItem("redirectAfterLogin", `/order/${id}`);
-      alert("Please login to place an order");
+      alert(t("order.loginToOrder"));
       navigate("/signin");
       return;
     }
 
     // Validate required fields
     if (!formData.phone) {
-      alert("Please enter your phone number");
+      alert(t("order.enterPhone"));
       return;
     }
     if (!formData.address) {
-      alert("Please enter your delivery address");
+      alert(t("order.enterAddress"));
       return;
     }
     if (!formData.color) {
-      alert("Please select a color");
+      alert(t("order.selectColor"));
       return;
     }
 
@@ -137,7 +139,7 @@ export default function Order() {
 
       await createOrder(orderData);
 
-      alert("Order placed successfully! 🎉");
+      alert(t("order.orderSuccess"));
 
       // Clear redirect after successful order
       localStorage.removeItem("redirectAfterLogin");
@@ -150,7 +152,7 @@ export default function Order() {
       console.error("Order error:", error);
 
       const errorMessage =
-        error.response?.data?.message || "Order failed. Please try again.";
+        error.response?.data?.message || t("order.orderFailed");
       alert(errorMessage);
 
       if (
@@ -173,7 +175,7 @@ export default function Order() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-[#d4af37] border-t-transparent"></div>
-          <p className="mt-4 text-gray-500">Loading product details...</p>
+          <p className="mt-4 text-gray-500">{t("order.loading")}</p>
         </div>
       </div>
     );
@@ -183,15 +185,13 @@ export default function Order() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <div className="text-6xl text-gray-300 mb-4">🔍</div>
-        <h2 className="text-2xl font-bold text-[#24312c]">Product Not Found</h2>
-        <p className="text-gray-500 mt-2">
-          The product you're looking for doesn't exist.
-        </p>
+        <h2 className="text-2xl font-bold text-[#24312c]">{t("order.notFoundTitle")}</h2>
+        <p className="text-gray-500 mt-2">{t("order.notFoundBody")}</p>
         <button
           onClick={() => navigate("/home")}
           className="mt-6 rounded-xl bg-[#d4af37] px-8 py-3 font-medium text-white transition hover:bg-[#b88f1d]"
         >
-          Back to Shopping
+          {t("order.backToShopping")}
         </button>
       </div>
     );
@@ -208,7 +208,7 @@ export default function Order() {
           className="group mb-8 flex items-center gap-2 rounded-xl bg-[#24312c] px-6 py-3 text-white shadow-lg transition hover:bg-[#18201d] hover:shadow-xl"
         >
           <FaArrowLeft className="transition-transform group-hover:-translate-x-1" />
-          Back
+          {t("order.back")}
         </button>
 
         <div className="grid gap-8 lg:grid-cols-5">
@@ -233,10 +233,10 @@ export default function Order() {
                 <div className="absolute left-4 top-4 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-sm">
                   {product.stock > 0 ? (
                     <span className="text-green-600">
-                      ✓ In Stock ({product.stock} available)
+                      ✓ {t("order.inStock")} ({product.stock} available)
                     </span>
                   ) : (
-                    <span className="text-red-500">Out of Stock</span>
+                    <span className="text-red-500">{t("order.outOfStock")}</span>
                   )}
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function Order() {
                   <span className="text-3xl font-extrabold text-[#d4af37]">
                     {product.price.toLocaleString()} ETB
                   </span>
-                  <span className="text-sm text-gray-400">per item</span>
+                  <span className="text-sm text-gray-400">{t("order.perItem")}</span>
                 </div>
 
                 {product.description && (
@@ -270,19 +270,17 @@ export default function Order() {
                   </h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Price per item</span>
+                      <span className="text-gray-500">{t("order.perItem")}</span>
                       <span className="font-medium">
                         {product.price.toLocaleString()} ETB
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Quantity</span>
+                      <span className="text-gray-500">{t("order.quantity")}</span>
                       <span className="font-medium">× {formData.quantity}</span>
                     </div>
                     <div className="flex justify-between border-t border-gray-200 pt-2">
-                      <span className="font-semibold text-[#24312c]">
-                        Total
-                      </span>
+                      <span className="font-semibold text-[#24312c]">{t("order.totalAmount")}</span>
                       <span className="text-xl font-bold text-[#d4af37]">
                         {totalPrice.toLocaleString()} ETB
                       </span>
@@ -294,15 +292,15 @@ export default function Order() {
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   <div className="rounded-xl bg-green-50 p-3 text-center">
                     <FaTruck className="mx-auto text-green-600" />
-                    <p className="mt-1 text-xs text-gray-600">Free Delivery</p>
+                    <p className="mt-1 text-xs text-gray-600">{t("order.freeDelivery")}</p>
                   </div>
                   <div className="rounded-xl bg-blue-50 p-3 text-center">
                     <FaShieldAlt className="mx-auto text-blue-600" />
-                    <p className="mt-1 text-xs text-gray-600">Secure Order</p>
+                    <p className="mt-1 text-xs text-gray-600">{t("order.secureOrder")}</p>
                   </div>
                   <div className="rounded-xl bg-purple-50 p-3 text-center">
                     <FaClock className="mx-auto text-purple-600" />
-                    <p className="mt-1 text-xs text-gray-600">24/7 Support</p>
+                    <p className="mt-1 text-xs text-gray-600">{t("order.support247")}</p>
                   </div>
                 </div>
               </div>
@@ -335,7 +333,7 @@ export default function Order() {
                   <div>
                     <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                       <FaHashtag className="text-[#d4af37]" />
-                      Quantity
+                      {t("order.quantity")}
                     </label>
                     <input
                       type="number"
@@ -358,7 +356,7 @@ export default function Order() {
                   <div>
                     <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                       <FaTshirt className="text-[#d4af37]" />
-                      Size
+                      {t("order.size")}
                     </label>
                     <select
                       name="size"
@@ -379,7 +377,7 @@ export default function Order() {
                 <div>
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                     <FaPalette className="text-[#d4af37]" />
-                    Color
+                    {t("order.color")}
                   </label>
                   <input
                     name="color"
@@ -394,7 +392,7 @@ export default function Order() {
                 <div>
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                     <FaPhone className="text-[#d4af37]" />
-                    Phone Number
+                    {t("order.phone")}
                   </label>
                   <div className="flex items-center gap-3 rounded-xl border border-gray-300 px-4 transition focus-within:border-[#d4af37]">
                     <FaPhone className="text-[#d4af37]" />
@@ -413,7 +411,7 @@ export default function Order() {
                 <div>
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                     <FaMapMarkerAlt className="text-[#d4af37]" />
-                    Delivery Address
+                    {t("order.deliveryAddress")}
                   </label>
                   <div className="flex items-start gap-3 rounded-xl border border-gray-300 px-4 transition focus-within:border-[#d4af37]">
                     <FaMapMarkerAlt className="mt-3 text-[#d4af37]" />
@@ -433,7 +431,7 @@ export default function Order() {
                 <div>
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                     <FaCreditCard className="text-[#d4af37]" />
-                    Payment Method
+                    {t("order.paymentMethod")}
                   </label>
                   <div className="flex items-center gap-3 rounded-xl border border-gray-300 px-4 transition focus-within:border-[#d4af37]">
                     <FaCreditCard className="text-[#d4af37]" />
@@ -443,10 +441,10 @@ export default function Order() {
                       onChange={handleChange}
                       className="w-full bg-transparent py-3 text-[#24312c] outline-none"
                     >
-                      <option value="Cash">Cash on Delivery</option>
-                      <option value="Telebirr">Telebirr</option>
-                      <option value="CBE">CBE Birr</option>
-                      <option value="Bank">Bank Transfer</option>
+                      <option value="Cash">{t("order.paymentCash")}</option>
+                      <option value="Telebirr">{t("order.paymentTelebirr")}</option>
+                      <option value="CBE">{t("order.paymentCbe")}</option>
+                      <option value="Bank">{t("order.paymentBank")}</option>
                     </select>
                   </div>
                 </div>
@@ -455,7 +453,7 @@ export default function Order() {
                 <div>
                   <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#24312c]">
                     <FaClipboardList className="text-[#d4af37]" />
-                    Additional Note (Optional)
+                    {t("order.note")}
                   </label>
                   <textarea
                     name="note"
@@ -477,12 +475,12 @@ export default function Order() {
                   {submitting ? (
                     <>
                       <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                      Placing Order...
+                      {t("order.placing")}
                     </>
                   ) : (
                     <>
                       <FaShoppingBag />
-                      Review Order - {totalPrice.toLocaleString()} ETB
+                      {t("order.reviewOrder")} - {totalPrice.toLocaleString()} ETB
                     </>
                   )}
                 </button>
@@ -490,7 +488,7 @@ export default function Order() {
                 {/* Security Note */}
                 <p className="text-center text-xs text-gray-400">
                   <FaShieldAlt className="mx-auto mb-1 inline-block text-gray-300" />
-                  Your order is secure and encrypted
+                  {t("order.secure")}
                 </p>
               </div>
             </form>
@@ -520,10 +518,10 @@ export default function Order() {
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-base sm:text-xl font-bold text-white truncate">
-                      Confirm Order
+                      {t("order.confirmOrder")}
                     </h3>
                     <p className="hidden sm:block text-xs sm:text-sm text-gray-300 truncate">
-                      Review your order details
+                      {t("order.confirmBody")}
                     </p>
                   </div>
                 </div>
@@ -560,7 +558,7 @@ export default function Order() {
               {/* Order Details */}
               <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 sm:p-4">
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-gray-500">Price per item</span>
+                  <span className="text-gray-500">{t("order.perItem")}</span>
                   <span className="font-medium text-[#24312c]">
                     {product.price.toLocaleString()} ETB
                   </span>
@@ -604,10 +602,10 @@ export default function Order() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
                     <p className="text-sm sm:text-base font-semibold text-[#24312c]">
-                      Total Amount
+                      {t("order.totalAmount")}
                     </p>
                     <p className="text-[10px] sm:text-xs text-gray-500">
-                      Including delivery & taxes
+                      {t("order.inclDelivery")}
                     </p>
                   </div>
                   <div className="text-right">
@@ -626,7 +624,7 @@ export default function Order() {
                   onClick={handleCancelOrder}
                   className="order-2 sm:order-1 flex-1 rounded-xl border-2 border-gray-200 px-4 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-gray-600 transition hover:bg-gray-50 hover:border-gray-300"
                 >
-                  Cancel
+                  {t("order.cancel")}
                 </button>
                 <button
                   onClick={handleConfirmOrder}
@@ -636,12 +634,12 @@ export default function Order() {
                   {submitting ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                      <span className="text-xs sm:text-sm">Placing...</span>
+                      <span className="text-xs sm:text-sm">{t("order.placing")}</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">
                       <FaCheckCircle className="text-sm sm:text-base" />
-                      <span className="text-xs sm:text-sm">Confirm Order</span>
+                      <span className="text-xs sm:text-sm">{t("order.confirmOrder")}</span>
                     </div>
                   )}
                 </button>
