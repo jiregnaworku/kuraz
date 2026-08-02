@@ -23,6 +23,7 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, unread, read
+  const [markingAll, setMarkingAll] = useState(false);
 
   // ===============================
   // Load Notifications
@@ -62,17 +63,41 @@ export default function Notifications() {
   };
 
   // ===============================
-  // Mark All as Read
+  // Mark All as Read - Fixed Version
   // ===============================
 
   const handleMarkAllAsRead = async () => {
+    const unreadNotifications = notifications.filter((n) => !n.isRead);
+
+    if (unreadNotifications.length === 0) {
+      toast.success("All notifications are already read");
+      return;
+    }
+
+    setMarkingAll(true);
+
     try {
+      // Try the bulk endpoint first (now using /read-all)
       await markAllAsRead();
       toast.success("All notifications marked as read");
       loadNotifications();
     } catch (error) {
-      console.error("Error marking all as read:", error);
-      toast.error("Failed to mark all as read");
+      console.error("Bulk mark all failed, trying individual:", error);
+
+      // Fallback: Mark each unread notification individually
+      try {
+        const promises = unreadNotifications.map((n) =>
+          markNotificationRead(n._id),
+        );
+        await Promise.all(promises);
+        toast.success("All notifications marked as read");
+        loadNotifications();
+      } catch (fallbackError) {
+        console.error("Individual mark all failed:", fallbackError);
+        toast.error("Failed to mark all as read. Please try again.");
+      }
+    } finally {
+      setMarkingAll(false);
     }
   };
 
@@ -178,10 +203,24 @@ export default function Notifications() {
             {notifications.length > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+                disabled={markingAll || unreadCount === 0}
+                className={`flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium transition ${
+                  markingAll || unreadCount === 0
+                    ? "cursor-not-allowed opacity-50 text-gray-400"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
               >
-                <FaCheckDouble />
-                Mark all read
+                {markingAll ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#d4af37] border-t-transparent"></div>
+                    Marking...
+                  </>
+                ) : (
+                  <>
+                    <FaCheckDouble />
+                    Mark all read
+                  </>
+                )}
               </button>
             )}
           </div>

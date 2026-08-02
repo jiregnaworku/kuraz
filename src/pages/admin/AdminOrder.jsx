@@ -14,9 +14,11 @@ import {
   FaTag,
   FaClock,
   FaBox,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { getOrders, updateOrderStatus } from "../../api/OrderApi";
 import { toast } from "react-hot-toast";
+import ConfirmModal from "../../components/profile/ConfirmModal";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -28,6 +30,11 @@ export default function Orders() {
     key: "createdAt",
     direction: "desc",
   });
+
+  // Modal states
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [pendingStatus, setPendingStatus] = useState("");
 
   const statusOptions = [
     "All",
@@ -114,18 +121,49 @@ export default function Orders() {
   }, [orders, statusFilter, searchTerm, sortConfig]);
 
   // ===============================
-  // Update Order Status
+  // Open Status Change Modal
   // ===============================
 
-  const changeStatus = async (id, status) => {
+  const openStatusModal = (order, newStatus) => {
+    // Don't show modal if status is the same
+    if (order.orderStatus === newStatus) {
+      toast.info(`Order is already ${newStatus}`);
+      return;
+    }
+
+    setSelectedOrder(order);
+    setPendingStatus(newStatus);
+    setShowStatusModal(true);
+  };
+
+  // ===============================
+  // Update Order Status (Confirmed)
+  // ===============================
+
+  const handleStatusChange = async () => {
+    if (!selectedOrder || !pendingStatus) return;
+
     try {
-      await updateOrderStatus(id, { status });
-      toast.success(`Order status updated to ${status}`);
+      await updateOrderStatus(selectedOrder._id, { status: pendingStatus });
+      toast.success(`Order status updated to ${pendingStatus}`);
+      setShowStatusModal(false);
+      setSelectedOrder(null);
+      setPendingStatus("");
       fetchOrders();
     } catch (error) {
       console.error(error);
       toast.error("Failed to update order status");
     }
+  };
+
+  // ===============================
+  // Cancel Status Change
+  // ===============================
+
+  const cancelStatusChange = () => {
+    setShowStatusModal(false);
+    setSelectedOrder(null);
+    setPendingStatus("");
   };
 
   // ===============================
@@ -169,6 +207,21 @@ export default function Orders() {
       Cancelled: <FaTimes className="text-red-600" />,
     };
     return icons[status] || <FaClock className="text-gray-600" />;
+  };
+
+  // ===============================
+  // Get Status Button Style
+  // ===============================
+
+  const getStatusButtonStyle = (status) => {
+    const styles = {
+      Accepted: "bg-green-100 text-green-700 hover:bg-green-200",
+      Preparing: "bg-purple-100 text-purple-700 hover:bg-purple-200",
+      Shipping: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+      Delivered: "bg-emerald-100 text-emerald-700 hover:bg-emerald-200",
+      Cancelled: "bg-red-100 text-red-700 hover:bg-red-200",
+    };
+    return styles[status] || "bg-gray-100 text-gray-700 hover:bg-gray-200";
   };
 
   // ===============================
@@ -423,37 +476,58 @@ export default function Orders() {
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-1">
                         <button
-                          onClick={() => changeStatus(order._id, "Accepted")}
-                          className="rounded-lg bg-green-100 p-2 text-green-700 transition hover:bg-green-200 hover:scale-105"
+                          onClick={() => openStatusModal(order, "Accepted")}
+                          className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Accepted")}`}
                           title="Accept"
+                          disabled={
+                            order.orderStatus === "Accepted" ||
+                            order.orderStatus === "Cancelled" ||
+                            order.orderStatus === "Delivered"
+                          }
                         >
                           <FaCheck />
                         </button>
                         <button
-                          onClick={() => changeStatus(order._id, "Preparing")}
-                          className="rounded-lg bg-purple-100 p-2 text-purple-700 transition hover:bg-purple-200 hover:scale-105"
+                          onClick={() => openStatusModal(order, "Preparing")}
+                          className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Preparing")}`}
                           title="Prepare"
+                          disabled={
+                            order.orderStatus === "Cancelled" ||
+                            order.orderStatus === "Delivered"
+                          }
                         >
                           <FaBox />
                         </button>
                         <button
-                          onClick={() => changeStatus(order._id, "Shipping")}
-                          className="rounded-lg bg-blue-100 p-2 text-blue-700 transition hover:bg-blue-200 hover:scale-105"
+                          onClick={() => openStatusModal(order, "Shipping")}
+                          className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Shipping")}`}
                           title="Ship"
+                          disabled={
+                            order.orderStatus === "Cancelled" ||
+                            order.orderStatus === "Delivered"
+                          }
                         >
                           <FaTruck />
                         </button>
                         <button
-                          onClick={() => changeStatus(order._id, "Delivered")}
-                          className="rounded-lg bg-emerald-100 p-2 text-emerald-700 transition hover:bg-emerald-200 hover:scale-105"
+                          onClick={() => openStatusModal(order, "Delivered")}
+                          className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Delivered")}`}
                           title="Deliver"
+                          disabled={
+                            order.orderStatus === "Cancelled" ||
+                            order.orderStatus === "Delivered"
+                          }
                         >
                           <FaCheck className="text-emerald-700" />
                         </button>
                         <button
-                          onClick={() => changeStatus(order._id, "Cancelled")}
-                          className="rounded-lg bg-red-100 p-2 text-red-700 transition hover:bg-red-200 hover:scale-105"
+                          onClick={() => openStatusModal(order, "Cancelled")}
+                          className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Cancelled")}`}
                           title="Cancel"
+                          disabled={
+                            order.orderStatus === "Cancelled" ||
+                            order.orderStatus === "Delivered"
+                          }
                         >
                           <FaTimes />
                         </button>
@@ -554,32 +628,53 @@ export default function Orders() {
               {/* Actions */}
               <div className="mt-4 grid grid-cols-5 gap-2">
                 <button
-                  onClick={() => changeStatus(order._id, "Accepted")}
-                  className="rounded-xl bg-green-100 py-2 text-xs font-medium text-green-700 transition hover:bg-green-200"
+                  onClick={() => openStatusModal(order, "Accepted")}
+                  className={`rounded-xl py-2 text-xs font-medium transition hover:scale-105 ${getStatusButtonStyle("Accepted")}`}
+                  disabled={
+                    order.orderStatus === "Accepted" ||
+                    order.orderStatus === "Cancelled" ||
+                    order.orderStatus === "Delivered"
+                  }
                 >
                   Accept
                 </button>
                 <button
-                  onClick={() => changeStatus(order._id, "Preparing")}
-                  className="rounded-xl bg-purple-100 py-2 text-xs font-medium text-purple-700 transition hover:bg-purple-200"
+                  onClick={() => openStatusModal(order, "Preparing")}
+                  className={`rounded-xl py-2 text-xs font-medium transition hover:scale-105 ${getStatusButtonStyle("Preparing")}`}
+                  disabled={
+                    order.orderStatus === "Cancelled" ||
+                    order.orderStatus === "Delivered"
+                  }
                 >
                   Prepare
                 </button>
                 <button
-                  onClick={() => changeStatus(order._id, "Shipping")}
-                  className="rounded-xl bg-blue-100 py-2 text-xs font-medium text-blue-700 transition hover:bg-blue-200"
+                  onClick={() => openStatusModal(order, "Shipping")}
+                  className={`rounded-xl py-2 text-xs font-medium transition hover:scale-105 ${getStatusButtonStyle("Shipping")}`}
+                  disabled={
+                    order.orderStatus === "Cancelled" ||
+                    order.orderStatus === "Delivered"
+                  }
                 >
                   Ship
                 </button>
                 <button
-                  onClick={() => changeStatus(order._id, "Delivered")}
-                  className="rounded-xl bg-emerald-100 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-200"
+                  onClick={() => openStatusModal(order, "Delivered")}
+                  className={`rounded-xl py-2 text-xs font-medium transition hover:scale-105 ${getStatusButtonStyle("Delivered")}`}
+                  disabled={
+                    order.orderStatus === "Cancelled" ||
+                    order.orderStatus === "Delivered"
+                  }
                 >
                   Deliver
                 </button>
                 <button
-                  onClick={() => changeStatus(order._id, "Cancelled")}
-                  className="rounded-xl bg-red-100 py-2 text-xs font-medium text-red-700 transition hover:bg-red-200"
+                  onClick={() => openStatusModal(order, "Cancelled")}
+                  className={`rounded-xl py-2 text-xs font-medium transition hover:scale-105 ${getStatusButtonStyle("Cancelled")}`}
+                  disabled={
+                    order.orderStatus === "Cancelled" ||
+                    order.orderStatus === "Delivered"
+                  }
                 >
                   Cancel
                 </button>
@@ -588,6 +683,31 @@ export default function Orders() {
           ))
         )}
       </div>
+
+      {/* Status Change Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showStatusModal}
+        onConfirm={handleStatusChange}
+        onCancel={cancelStatusChange}
+        title={`Change Order Status to ${pendingStatus}`}
+        message={
+          pendingStatus === "Cancelled"
+            ? `Are you sure you want to cancel order #${selectedOrder?.orderNumber || "N/A"}? This action cannot be undone.`
+            : `Are you sure you want to change order #${selectedOrder?.orderNumber || "N/A"} status from "${selectedOrder?.orderStatus}" to "${pendingStatus}"?`
+        }
+        confirmText={`Change to ${pendingStatus}`}
+        cancelText="Cancel"
+        type={pendingStatus === "Cancelled" ? "danger" : "warning"}
+        icon={
+          pendingStatus === "Cancelled" ? (
+            <FaTimes className="text-3xl text-red-600" />
+          ) : pendingStatus === "Delivered" ? (
+            <FaCheck className="text-3xl text-green-600" />
+          ) : (
+            <FaExclamationTriangle className="text-3xl text-yellow-600" />
+          )
+        }
+      />
 
       {/* Pagination (if needed) */}
       {filteredOrders.length > 10 && (

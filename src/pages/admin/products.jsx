@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 import ProductTable from "./ProductTable";
 import ProductForm from "./ProductForm";
-import DeleteProductModal from "./DeleteProductModal";
+import ConfirmModal from "../../components/profile/ConfirmModal"; // Import the modal
 
 import {
   getProducts,
@@ -19,6 +19,7 @@ export default function Products() {
 
   const [saving, setSaving] = useState(false);
 
+  // eslint-disable-next-line no-unused-vars
   const [deleting, setDeleting] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
@@ -103,11 +104,13 @@ export default function Products() {
     setDeleteProductData(product);
   };
 
-  const confirmDelete = async (id) => {
+  const confirmDelete = async () => {
+    if (!deleteProductData) return;
+
     try {
       setDeleting(true);
 
-      await deleteProduct(id);
+      await deleteProduct(deleteProductData._id);
 
       setDeleteProductData(null);
 
@@ -118,6 +121,10 @@ export default function Products() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteProductData(null);
   };
 
   return (
@@ -167,14 +174,19 @@ export default function Products() {
         />
       )}
 
-      {/* Delete */}
-
+      {/* Delete Confirmation Modal - Using ConfirmModal */}
       {deleteProductData && (
-        <DeleteProductModal
-          product={deleteProductData}
-          loading={deleting}
-          onClose={() => setDeleteProductData(null)}
+        <ConfirmModal
+          isOpen={true}
           onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          title={`Delete Product`}
+          message={`Are you sure you want to delete "${deleteProductData.name || deleteProductData.productName || "this product"}"? This action cannot be undone. All product data will be permanently removed.`}
+          confirmText="Delete Product"
+          cancelText="Cancel"
+          type="danger"
+          icon={<FaTrash className="text-3xl text-red-600" />}
+          danger={true}
         />
       )}
     </div>

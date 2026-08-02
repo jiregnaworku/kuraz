@@ -131,52 +131,52 @@ export default function ProductCard({ product }) {
           </div>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-2 sm:p-3">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="flex items-center gap-3 text-xs text-gray-300 sm:text-sm">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-3 sm:p-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-4 text-white">
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-1 transition ${liked ? "font-semibold text-red-400" : "hover:text-red-400"}`}
+                className={`flex items-center gap-2 transition text-base sm:text-lg ${liked ? "font-semibold text-red-400" : "hover:text-red-400"}`}
               >
-                <FaHeart className="text-[10px] sm:text-xs" />
-                <span className="text-[9px] sm:text-xs">{likesCount}</span>
+                <FaHeart className="text-base sm:text-lg md:text-xl" />
+                <span className="text-sm sm:text-base">{likesCount}</span>
               </button>
 
               <button
                 onClick={() => setCommentOpen(true)}
-                className="flex items-center gap-1 transition hover:text-[#d4af37]"
+                className="flex items-center gap-2 transition text-base sm:text-lg hover:text-[#d4af37]"
               >
-                <FaCommentDots className="text-[10px] sm:text-xs" />
-                <span className="text-[9px] sm:text-xs">{commentsCount}</span>
+                <FaCommentDots className="text-base sm:text-lg md:text-xl" />
+                <span className="text-sm sm:text-base">{commentsCount}</span>
               </button>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-extrabold text-[#d4af37] sm:text-sm md:text-base">
+            <span className="text-sm font-extrabold text-[#d4af37] sm:text-base md:text-lg">
               {product.price} ETB
             </span>
 
-            <div className="flex gap-1 sm:gap-2">
+            <div className="flex gap-2 sm:gap-3">
               <Link
                 to={`/product/${product._id}`}
-                className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 sm:h-7 sm:w-7 md:h-8 md:w-8"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 sm:h-9 sm:w-9 md:h-10 md:w-10"
               >
-                <FaEye className="text-xs sm:text-sm" />
+                <FaEye className="text-sm sm:text-base md:text-lg" />
               </Link>
 
               <button
                 onClick={handleShare}
-                className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 sm:h-7 sm:w-7 md:h-8 md:w-8"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30 sm:h-9 sm:w-9 md:h-10 md:w-10"
               >
-                <FaShareAlt className="text-xs sm:text-sm" />
+                <FaShareAlt className="text-sm sm:text-base md:text-lg" />
               </button>
 
               <button
                 onClick={handleOrder}
-                className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#d4af37] text-white transition hover:bg-[#b88f1d] sm:h-7 sm:w-7 md:h-8 md:w-8"
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#d4af37] text-white transition hover:bg-[#b88f1d] sm:h-9 sm:w-9 md:h-10 md:w-10"
               >
-                <FaShoppingBag className="text-xs sm:text-sm" />
+                <FaShoppingBag className="text-sm sm:text-base md:text-lg" />
               </button>
             </div>
           </div>

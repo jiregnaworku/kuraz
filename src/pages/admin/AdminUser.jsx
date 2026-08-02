@@ -7,13 +7,22 @@ import {
   FaBan,
   FaCheck,
   FaUsers,
+  FaUserSlash,
+  FaUserCheck,
 } from "react-icons/fa";
 
 import { getUsers, deleteUser, blockUser } from "../../api/userApi";
+import ConfirmModal from "../../components/profile/ConfirmModal";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+
+  // Modal states
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [, setActionType] = useState(""); // 'delete' or 'block'
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
@@ -29,30 +38,44 @@ export default function Users() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this user?",
-    );
+  // Open delete confirmation modal
+  const openDeleteModal = (user) => {
+    setSelectedUser(user);
+    setActionType("delete");
+    setShowDeleteModal(true);
+  };
 
-    if (!confirmDelete) return;
+  // Open block/unblock confirmation modal
+  const openBlockModal = (user) => {
+    setSelectedUser(user);
+    setActionType("block");
+    setShowBlockModal(true);
+  };
+
+  // Handle delete confirmation
+  const handleDelete = async () => {
+    if (!selectedUser) return;
 
     try {
-      await deleteUser(id);
-
-      setUsers((prev) => prev.filter((user) => user._id !== id));
+      await deleteUser(selectedUser._id);
+      setUsers((prev) => prev.filter((user) => user._id !== selectedUser._id));
+      setShowDeleteModal(false);
+      setSelectedUser(null);
     } catch (error) {
       console.error(error);
       alert("Failed to delete user.");
     }
   };
 
-  const handleBlock = async (id) => {
-    try {
-      const response = await blockUser(id);
+  // Handle block/unblock confirmation
+  const handleBlock = async () => {
+    if (!selectedUser) return;
 
+    try {
+      const response = await blockUser(selectedUser._id);
       setUsers((prev) =>
         prev.map((user) =>
-          user._id === id
+          user._id === selectedUser._id
             ? {
                 ...user,
                 isBlocked: response.isBlocked,
@@ -60,6 +83,8 @@ export default function Users() {
             : user,
         ),
       );
+      setShowBlockModal(false);
+      setSelectedUser(null);
     } catch (error) {
       console.error(error);
       alert("Failed to update user.");
@@ -201,7 +226,7 @@ export default function Users() {
                       {/* Block / Unblock */}
 
                       <button
-                        onClick={() => handleBlock(user._id)}
+                        onClick={() => openBlockModal(user)}
                         className={`rounded-lg p-2 transition ${
                           user.isBlocked
                             ? "bg-green-100 text-green-700 hover:bg-green-200"
@@ -215,7 +240,7 @@ export default function Users() {
                       {/* Delete */}
 
                       <button
-                        onClick={() => handleDelete(user._id)}
+                        onClick={() => openDeleteModal(user)}
                         className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
                         title="Delete User"
                       >
@@ -229,6 +254,48 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onConfirm={handleDelete}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setSelectedUser(null);
+        }}
+        title="Delete User"
+        message={`Are you sure you want to delete "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? This action cannot be undone. All their data will be permanently removed.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        icon={<FaTrash className="text-3xl text-red-600" />}
+      />
+
+      {/* Block/Unblock Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showBlockModal}
+        onConfirm={handleBlock}
+        onCancel={() => {
+          setShowBlockModal(false);
+          setSelectedUser(null);
+        }}
+        title={selectedUser?.isBlocked ? "Unblock User" : "Block User"}
+        message={
+          selectedUser?.isBlocked
+            ? `Are you sure you want to unblock "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? They will be able to access their account again.`
+            : `Are you sure you want to block "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? They will not be able to access their account.`
+        }
+        confirmText={selectedUser?.isBlocked ? "Unblock" : "Block"}
+        cancelText="Cancel"
+        type={selectedUser?.isBlocked ? "info" : "danger"}
+        icon={
+          selectedUser?.isBlocked ? (
+            <FaUserCheck className="text-3xl text-green-600" />
+          ) : (
+            <FaUserSlash className="text-3xl text-red-600" />
+          )
+        }
+      />
     </div>
   );
 }

@@ -12,12 +12,16 @@ import {
   FaBell,
   FaUserCircle,
   FaSignOutAlt,
+  FaHome,
 } from "react-icons/fa";
+
+import ConfirmModal from "../components/profile/ConfirmModal"; // Import the modal
 
 export default function AdminNavbar() {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const admin = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -51,12 +55,9 @@ export default function AdminNavbar() {
   ];
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to logout?");
-    if (confirmLogout) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      navigate("/signin");
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/signin");
   };
 
   return (
@@ -78,37 +79,60 @@ export default function AdminNavbar() {
           className="
           mx-auto
           flex
-          h-20
+          h-16
           max-w-7xl
           items-center
           justify-between
-          px-4
-          sm:px-6
-          lg:px-8
+          px-3
+          sm:px-4
+          md:h-20
+          lg:px-6
           "
         >
-          {/* Logo */}
+          {/* Logo and Home Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/admin"
+              className="
+              text-base
+              font-bold
+              tracking-wide
+              text-[#d4af37]
+              sm:text-lg
+              md:text-2xl
+              "
+            >
+              Kuraz Admin
+            </Link>
 
-          <Link
-            to="/admin"
-            className="
-            text-2xl
-            font-bold
-            tracking-wide
-            text-[#d4af37]
-            "
-          >
-            Kuraz Admin
-          </Link>
+            {/* Back to Home - Mobile */}
+            <Link
+              to="/#home"
+              className="
+              rounded-full
+              bg-white/10
+              p-2
+              text-gray-200
+              transition
+              hover:bg-white/20
+              hover:text-[#d4af37]
+              sm:p-2.5
+              md:hidden
+              "
+              title="Back to Home"
+            >
+              <FaHome className="text-xs sm:text-sm" />
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
-
           <nav
             className="
             hidden
             items-center
-            gap-2
+            gap-1
             lg:flex
+            xl:gap-2
             "
           >
             {menu.map((item) => (
@@ -120,14 +144,16 @@ export default function AdminNavbar() {
                   `
                   flex
                   items-center
-                  gap-2
+                  gap-1.5
                   rounded-xl
-                  px-4
-                  py-2.5
+                  px-3
+                  py-2
                   text-sm
                   font-medium
                   transition-all
                   duration-200
+                  xl:px-4
+                  xl:py-2.5
 
                   ${
                     isActive
@@ -137,37 +163,63 @@ export default function AdminNavbar() {
                   `
                 }
               >
-                {item.icon}
-                {item.name}
+                <span className="text-xs xl:text-sm">{item.icon}</span>
+                <span className="hidden xl:inline">{item.name}</span>
+                <span className="xl:hidden">{item.name.charAt(0)}</span>
               </NavLink>
             ))}
           </nav>
 
           {/* Right Section */}
-
           <div
             className="
             hidden
             items-center
-            gap-3
+            gap-1
+            sm:gap-2
+            md:gap-3
             lg:flex
             "
           >
+            {/* Back to Home - Desktop */}
+            <Link
+              to="/#home"
+              className="
+              hidden
+              items-center
+              gap-2
+              rounded-full
+              bg-white/10
+              px-3
+              py-2
+              text-sm
+              text-gray-200
+              transition
+              hover:bg-white/20
+              hover:text-[#d4af37]
+              lg:flex
+              xl:px-4
+              "
+            >
+              <FaHome className="text-xs xl:text-sm" />
+              <span className="hidden xl:inline">Home</span>
+            </Link>
+
             {/* Notifications */}
             <Link
               to="/admin/notifications"
               className="
+              relative
               rounded-xl
-              p-3
+              p-2.5
               text-gray-200
               transition
               hover:bg-white/10
               hover:text-[#d4af37]
-              relative
+              sm:p-3
               "
             >
-              <FaBell size={18} />
-              {/* Optional: Add notification badge */}
+              <FaBell className="text-sm sm:text-base" />
               <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
             </Link>
 
@@ -177,63 +229,71 @@ export default function AdminNavbar() {
               className="
               flex
               items-center
-              gap-3
+              gap-2
               rounded-xl
               bg-white/5
-              px-3
-              py-2
+              px-2
+              py-1.5
               transition
               hover:bg-white/10
               hover:shadow-lg
+              sm:px-3
+              sm:py-2
               "
             >
-              <FaUserCircle className="text-[#d4af37]" size={30} />
+              <FaUserCircle className="text-[#d4af37]" size={24} />
 
-              <div className="text-left">
-                <p className="text-sm font-semibold text-white">
-                  {admin?.fullName || "Admin"}
+              <div className="hidden sm:block">
+                <p className="text-xs font-semibold text-white sm:text-sm">
+                  {admin?.fullName?.split(" ")[0] || "Admin"}
                 </p>
 
-                <p className="text-xs text-gray-400">Administrator</p>
+                <p className="text-[10px] text-gray-400 sm:text-xs">
+                  Administrator
+                </p>
               </div>
             </Link>
 
             {/* Logout */}
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutModal(true)}
               className="
               rounded-xl
               bg-red-500/10
-              p-3
+              p-2.5
               text-red-400
               transition
               hover:bg-red-500
               hover:text-white
+              sm:p-3
               "
             >
-              <FaSignOutAlt />
+              <FaSignOutAlt className="text-sm sm:text-base" />
             </button>
           </div>
 
           {/* Mobile Menu Button */}
-
           <button
             onClick={() => setOpen(!open)}
             className="
             rounded-xl
-            p-3
+            p-2
             text-white
             hover:bg-white/10
+            sm:p-3
             lg:hidden
             "
           >
-            {open ? <FaTimes /> : <FaBars />}
+            {open ? (
+              <FaTimes className="text-lg sm:text-xl" />
+            ) : (
+              <FaBars className="text-lg sm:text-xl" />
+            )}
           </button>
         </div>
       </header>
 
       {/* Mobile Drawer */}
-
       <div
         className={`
         fixed
@@ -241,40 +301,43 @@ export default function AdminNavbar() {
         right-0
         z-50
         h-screen
-        w-72
+        w-[280px]
         bg-[#1b2b26]
         shadow-2xl
         transition-transform
         duration-300
+        ease-in-out
         lg:hidden
 
         ${open ? "translate-x-0" : "translate-x-full"}
         `}
       >
-        <div className="flex items-center justify-between border-b border-white/10 p-5">
-          <h2 className="text-xl font-bold text-[#d4af37]">Admin Menu</h2>
+        <div className="flex items-center justify-between border-b border-white/10 p-4 sm:p-5">
+          <h2 className="text-lg font-bold text-[#d4af37] sm:text-xl">
+            Admin Menu
+          </h2>
 
-          <button onClick={() => setOpen(false)} className="text-white">
-            <FaTimes />
+          <button onClick={() => setOpen(false)} className="text-white p-1">
+            <FaTimes className="text-xl sm:text-2xl" />
           </button>
         </div>
 
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           {/* User Info */}
-          <div className="mb-8 flex items-center gap-3">
-            <FaUserCircle size={50} className="text-[#d4af37]" />
+          <div className="mb-6 flex items-center gap-3 sm:mb-8">
+            <FaUserCircle size={40} className="text-[#d4af37] sm:text-5xl" />
 
             <div>
-              <h3 className="font-semibold text-white">
+              <h3 className="text-sm font-semibold text-white sm:text-base">
                 {admin?.fullName || "Admin"}
               </h3>
 
-              <p className="text-sm text-gray-400">Administrator</p>
+              <p className="text-xs text-gray-400 sm:text-sm">Administrator</p>
             </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className="space-y-2">
+          <nav className="space-y-1 sm:space-y-2">
             {menu.map((item) => (
               <NavLink
                 key={item.path}
@@ -287,9 +350,12 @@ export default function AdminNavbar() {
                   items-center
                   gap-3
                   rounded-xl
-                  px-4
-                  py-3
+                  px-3
+                  py-2.5
+                  text-sm
                   transition
+                  sm:px-4
+                  sm:py-3
 
                   ${
                     isActive
@@ -299,8 +365,8 @@ export default function AdminNavbar() {
                   `
                 }
               >
-                {item.icon}
-                {item.name}
+                <span className="text-base sm:text-lg">{item.icon}</span>
+                <span className="text-sm sm:text-base">{item.name}</span>
               </NavLink>
             ))}
 
@@ -308,10 +374,10 @@ export default function AdminNavbar() {
             <NavLink
               to="/admin/notifications"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-200 transition hover:bg-white/10"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-200 transition hover:bg-white/10 sm:px-4 sm:py-3"
             >
-              <FaBell />
-              Notifications
+              <FaBell className="text-base sm:text-lg" />
+              <span className="text-sm sm:text-base">Notifications</span>
               <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                 0
               </span>
@@ -327,9 +393,12 @@ export default function AdminNavbar() {
                 items-center
                 gap-3
                 rounded-xl
-                px-4
-                py-3
+                px-3
+                py-2.5
+                text-sm
                 transition
+                sm:px-4
+                sm:py-3
 
                 ${
                   isActive
@@ -339,31 +408,49 @@ export default function AdminNavbar() {
                 `
               }
             >
-              <FaUserCircle />
-              Profile
+              <FaUserCircle className="text-base sm:text-lg" />
+              <span className="text-sm sm:text-base">Profile</span>
             </NavLink>
+
+            {/* Back to Home - Mobile */}
+            <Link
+              to="/#home"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-200 transition hover:bg-white/10 sm:px-4 sm:py-3"
+            >
+              <FaHome className="text-base sm:text-lg" />
+              <span className="text-sm sm:text-base">Back to Home</span>
+            </Link>
+
+            {/* Divider */}
+            <div className="my-3 border-t border-white/10 sm:my-4"></div>
 
             {/* Logout - Mobile */}
             <button
-              onClick={handleLogout}
+              onClick={() => {
+                setOpen(false);
+                setShowLogoutModal(true);
+              }}
               className="
-              mt-4
               flex
               w-full
               items-center
               gap-3
               rounded-xl
               bg-red-500/10
-              px-4
-              py-3
+              px-3
+              py-2.5
+              text-sm
               text-red-400
               transition
               hover:bg-red-500
               hover:text-white
+              sm:px-4
+              sm:py-3
               "
             >
-              <FaSignOutAlt />
-              Logout
+              <FaSignOutAlt className="text-base sm:text-lg" />
+              <span className="text-sm sm:text-base">Logout</span>
             </button>
           </nav>
         </div>
@@ -378,10 +465,24 @@ export default function AdminNavbar() {
           inset-0
           z-40
           bg-black/40
+          backdrop-blur-sm
           lg:hidden
           "
         />
       )}
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutModal(false)}
+        title="Logout Confirmation"
+        message="Are you sure you want to logout from the admin panel? You will need to login again to access the dashboard."
+        confirmText="Logout"
+        cancelText="Cancel"
+        type="danger"
+        icon={<FaSignOutAlt className="text-3xl text-red-600" />}
+      />
     </>
   );
 }

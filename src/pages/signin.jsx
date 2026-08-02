@@ -1,5 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaPhoneAlt, FaLock, FaSignInAlt } from "react-icons/fa";
+import {
+  FaPhoneAlt,
+  FaLock,
+  FaSignInAlt,
+  FaHome,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { useState } from "react";
 import API from "../api/api";
 import { useLanguage } from "../context/LanguageContext";
@@ -131,7 +137,49 @@ export default function Signin() {
         max-[480px]:p-5
         "
       >
-        <div className="mb-8 text-center">
+        {/* Back to Home Button - Inside Card */}
+        <Link
+          to="/#home"
+          className="
+            absolute
+            left-4
+            top-4
+            z-10
+            flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-white/30
+            bg-white/20
+            px-3
+            py-1.5
+            text-xs
+            font-medium
+            text-white
+            backdrop-blur-md
+            transition-all
+            duration-300
+            hover:bg-white/30
+            hover:scale-105
+            hover:shadow-lg
+            sm:left-5
+            sm:top-5
+            sm:px-4
+            sm:py-2
+            sm:text-sm
+            md:left-6
+            md:top-6
+          "
+        >
+          <FaHome className="text-[#ffffff] transition-transform duration-300 group-hover:scale-110 text-xs sm:text-sm" />
+          <span className="hidden sm:inline">Back to Home</span>
+          <span className="sm:hidden">
+            <FaArrowLeft className="text-[#ffffff] text-xs" />
+          </span>
+        </Link>
+
+        <div className="mb-8 text-center mt-4 sm:mt-2">
           <img
             src="/assets/images/kuraz.png"
             alt="Kuraz Logo"

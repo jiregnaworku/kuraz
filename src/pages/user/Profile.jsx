@@ -17,11 +17,13 @@ import { IoMdArrowBack } from "react-icons/io";
 import { useState } from "react";
 
 import Sidebar from "../../components/profile/Sidebar";
+import ConfirmModal from "../../components/profile/ConfirmModal"; // Import the modal
 
 export default function Profile() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false); // Add this state
 
   // Only true on /profile, not /profile/orders etc.
   const isMainProfile = location.pathname === "/profile";
@@ -50,6 +52,14 @@ export default function Profile() {
     if (path === "/profile/settings")
       return <FaCog className="text-[#d4af37]" />;
     return null;
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setMobileMenuOpen(false);
+    window.location.href = "/signin";
   };
 
   return (
@@ -280,19 +290,9 @@ export default function Profile() {
             {/* Divider */}
             <div className="my-4 border-t border-gray-100"></div>
 
-            {/* Logout Button */}
+            {/* Logout Button - Updated to use modal */}
             <button
-              onClick={() => {
-                const confirmLogout = window.confirm(
-                  "Are you sure you want to logout?",
-                );
-                if (confirmLogout) {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("user");
-                  setMobileMenuOpen(false);
-                  window.location.href = "/signin";
-                }
-              }}
+              onClick={() => setShowLogoutModal(true)}
               className="
                 flex w-full items-center gap-4 rounded-xl px-4 py-3 
                 text-red-500 transition-all duration-200
@@ -476,6 +476,19 @@ export default function Profile() {
           <Sidebar />
         </aside>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutModal(false)}
+        title="Logout Confirmation"
+        message="Are you sure you want to logout? You will need to login again to access your account."
+        confirmText="Logout"
+        cancelText="Cancel"
+        type="danger"
+        icon={<FaSignOutAlt className="text-3xl text-red-600" />}
+      />
     </section>
   );
 }
