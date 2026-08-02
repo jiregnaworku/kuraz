@@ -16,8 +16,10 @@ import {
   markAllAsRead,
   deleteNotification,
 } from "../../api/notificationApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function AdminNotifications() {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,29 +34,35 @@ export default function AdminNotifications() {
       setNotifications(data.notifications || []);
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      toast.error("Failed to load notifications");
+      toast.error(t("admin.failedToLoad") || "Failed to load notifications");
       // Fallback to demo data if API fails
       setNotifications([
         {
           _id: "1",
-          title: "New Order Received",
-          message: "Order #KURAZ-20260731-1234 has been placed",
+          title: t("admin.notificationNewOrder") || "New Order Received",
+          message:
+            t("admin.notificationOrderPlaced") ||
+            "Order #KURAZ-20260731-1234 has been placed",
           type: "order",
           isRead: false,
           createdAt: new Date(Date.now() - 2 * 60000).toISOString(),
         },
         {
           _id: "2",
-          title: "Order Delivered",
-          message: "Order #KURAZ-20260730-5678 has been delivered successfully",
+          title: t("admin.notificationOrderDelivered") || "Order Delivered",
+          message:
+            t("admin.notificationDeliveredSuccess") ||
+            "Order #KURAZ-20260730-5678 has been delivered successfully",
           type: "order",
           isRead: true,
           createdAt: new Date(Date.now() - 1 * 3600000).toISOString(),
         },
         {
           _id: "3",
-          title: "New User Registered",
-          message: "John Doe has created an account",
+          title: t("admin.notificationNewUser") || "New User Registered",
+          message:
+            t("admin.notificationUserCreated") ||
+            "John Doe has created an account",
           type: "system",
           isRead: false,
           createdAt: new Date(Date.now() - 3 * 3600000).toISOString(),
@@ -77,11 +85,13 @@ export default function AdminNotifications() {
   const handleMarkAllAsRead = async () => {
     try {
       await markAllAsRead();
-      toast.success("All notifications marked as read");
+      toast.success(
+        t("admin.markAllReadSuccess") || "All notifications marked as read",
+      );
       fetchNotifications();
     } catch (error) {
       console.error("Error marking all as read:", error);
-      toast.error("Failed to mark all as read");
+      toast.error(t("admin.failedToMarkRead") || "Failed to mark all as read");
     }
   };
 
@@ -90,17 +100,22 @@ export default function AdminNotifications() {
   // ===============================
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this notification?")) {
+    if (
+      !window.confirm(
+        t("admin.deleteNotificationConfirm") ||
+          "Are you sure you want to delete this notification?",
+      )
+    ) {
       return;
     }
 
     try {
       await deleteNotification(id);
-      toast.success("Notification deleted");
+      toast.success(t("admin.notificationDeleted") || "Notification deleted");
       fetchNotifications();
     } catch (error) {
       console.error("Error deleting notification:", error);
-      toast.error("Failed to delete notification");
+      toast.error(t("admin.failedToDelete") || "Failed to delete notification");
     }
   };
 
@@ -149,10 +164,25 @@ export default function AdminNotifications() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (minutes < 1) return t("admin.justNow") || "Just now";
+    if (minutes < 60) {
+      return (
+        t("admin.minutesAgo", { count: minutes }) ||
+        `${minutes} minute${minutes > 1 ? "s" : ""} ago`
+      );
+    }
+    if (hours < 24) {
+      return (
+        t("admin.hoursAgo", { count: hours }) ||
+        `${hours} hour${hours > 1 ? "s" : ""} ago`
+      );
+    }
+    if (days < 7) {
+      return (
+        t("admin.daysAgo", { count: days }) ||
+        `${days} day${days > 1 ? "s" : ""} ago`
+      );
+    }
     return new Date(date).toLocaleDateString();
   };
 
@@ -167,7 +197,7 @@ export default function AdminNotifications() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#d4af37] border-t-transparent"></div>
-          <p className="mt-4 text-gray-500">Loading notifications...</p>
+          <p className="mt-4 text-gray-500">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -179,15 +209,15 @@ export default function AdminNotifications() {
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#24312c]">Notifications</h1>
-            <p className="mt-1 text-gray-500">
-              Stay updated with admin activities
-            </p>
+            <h1 className="text-3xl font-bold text-[#24312c]">
+              {t("admin.notifications")}
+            </h1>
+            <p className="mt-1 text-gray-500">{t("admin.notificationsDesc")}</p>
           </div>
           <div className="flex items-center gap-3">
             {unreadCount > 0 && (
               <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-medium text-white">
-                {unreadCount} unread
+                {unreadCount} {t("admin.unread")}
               </span>
             )}
             {notifications.length > 0 && (
@@ -196,7 +226,7 @@ export default function AdminNotifications() {
                 className="flex items-center gap-2 rounded-xl bg-[#d4af37] px-6 py-2.5 font-medium text-white transition hover:bg-[#b88f1d] hover:shadow-lg"
               >
                 <FaCheck />
-                Mark all read
+                {t("admin.markAllRead")}
               </button>
             )}
           </div>
@@ -210,11 +240,9 @@ export default function AdminNotifications() {
                 <FaBell className="text-4xl text-gray-300" />
               </div>
               <h3 className="text-xl font-semibold text-[#24312c]">
-                No notifications
+                {t("admin.noNotifications")}
               </h3>
-              <p className="mt-2 text-gray-500">
-                You're all caught up! No new notifications.
-              </p>
+              <p className="mt-2 text-gray-500">{t("admin.allCaughtUp")}</p>
             </div>
           ) : (
             notifications.map((notification) => (
@@ -272,7 +300,7 @@ export default function AdminNotifications() {
         {notifications.length > 0 && (
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-400">
-              Showing {notifications.length} notifications
+              {t("admin.showing", { count: notifications.length })}
             </p>
           </div>
         )}

@@ -5,8 +5,10 @@ import ConversationList from "../../components/AdminText/ConversationList";
 import AdminChat from "../../components/AdminText/AdminChat";
 
 import { getAdminConversations } from "../../api/adminMessageApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Messages() {
+  const { t } = useLanguage();
   const [conversations, setConversations] = useState([]);
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -114,7 +116,9 @@ export default function Messages() {
                 {selectedUser?.fullName}
               </h2>
 
-              <p className="text-xs text-gray-300">Customer Support Chat</p>
+              <p className="text-xs text-gray-300">
+                {t("admin.customerSupportChat")}
+              </p>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaUpload, FaTrash, FaPlus } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 const emptyForm = {
   name: "",
@@ -16,6 +17,7 @@ export default function ProductForm({
   onSubmit,
   loading = false,
 }) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     ...emptyForm,
     ...initialData,
@@ -107,7 +109,7 @@ font-bold
 text-white
 "
         >
-          Create Product
+          {t("admin.createProduct")}
         </h2>
 
         <p
@@ -116,7 +118,7 @@ mt-2
 text-gray-400
 "
         >
-          Add new Ethiopian cultural fashion items.
+          {t("admin.createProductDesc")}
         </p>
       </div>
 
@@ -131,16 +133,16 @@ lg:grid-cols-2
 
         <div className="space-y-6">
           <Input
-            label="Product Name"
+            label={t("admin.productName")}
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="Habesha Kemis"
+            placeholder={t("admin.productNamePlaceholder") || "Habesha Kemis"}
           />
 
           <div>
             <label className="mb-2 block text-white font-semibold">
-              Category
+              {t("admin.category")}
             </label>
 
             <select
@@ -150,18 +152,18 @@ lg:grid-cols-2
               className="w-full rounded-xl bg-black/30 border border-white/10 px-4 py-3 text-white outline-none focus:border-[#d4af37]"
               required
             >
-              <option value="">Select Category</option>
-              <option value="Women's Dress">Women's Dress</option>
-              <option value="Men's Wear">Men's Wear</option>
-              <option value="Wedding">Wedding</option>
-              <option value="Kids">Kids</option>
-              <option value="Accessories">Accessories</option>
+              <option value="">{t("admin.selectCategory")}</option>
+              <option value="Women's Dress">{t("admin.womensDress")}</option>
+              <option value="Men's Wear">{t("admin.mensWear")}</option>
+              <option value="Wedding">{t("admin.wedding")}</option>
+              <option value="Kids">{t("admin.kids")}</option>
+              <option value="Accessories">{t("admin.accessories")}</option>
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Price ETB"
+              label={t("admin.priceETB")}
               name="price"
               type="number"
               value={formData.price}
@@ -169,7 +171,7 @@ lg:grid-cols-2
             />
 
             <Input
-              label="Stock"
+              label={t("admin.stock")}
               name="stock"
               type="number"
               value={formData.stock}
@@ -186,7 +188,7 @@ text-white
 font-semibold
 "
             >
-              Description
+              {t("admin.description")}
             </label>
 
             <textarea
@@ -224,7 +226,9 @@ gap-3
               className="h-5 w-5"
             />
 
-            <label className="text-white font-semibold">Featured Product</label>
+            <label className="text-white font-semibold">
+              {t("admin.featuredProduct")}
+            </label>
           </div>
         </div>
 
@@ -239,7 +243,7 @@ text-white
 font-semibold
 "
           >
-            Product Images
+            {t("admin.productImages")}
           </label>
 
           <label
@@ -268,7 +272,7 @@ text-[#d4af37]
 "
             />
 
-            <p className="text-white">Click to upload images</p>
+            <p className="text-white">{t("admin.uploadImages")}</p>
 
             <span
               className="
@@ -277,7 +281,7 @@ text-sm
 text-gray-400
 "
             >
-              PNG, JPG up to multiple files
+              {t("admin.dragDrop")}
             </span>
 
             <input
@@ -356,11 +360,11 @@ disabled:opacity-50
 "
       >
         {loading ? (
-          "Saving..."
+          t("common.saving") || "Saving..."
         ) : (
           <>
             <FaPlus />
-            Save Product
+            {t("admin.saveProduct")}
           </>
         )}
       </button>

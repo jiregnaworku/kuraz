@@ -15,8 +15,10 @@ import { Link } from "react-router-dom";
 import { getProducts } from "../../api/productApi";
 import { getOrders } from "../../api/OrderApi";
 import { getUsers } from "../../api/userApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Admin() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     products: 0,
     orders: 0,
@@ -60,24 +62,24 @@ export default function Admin() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-4 pt-6 pb-10 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-[#224248] px-4 pt-8 pb-4 sm:px-5 lg:px-10">
       {/* Header */}
 
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#24312c] sm:text-4xl">
-            Dashboard
+          <h1 className="text-3xl font-bold text-white sm:text-4xl">
+            {t("admin.dashboard")}
           </h1>
 
-          <p className="mt-1 text-sm text-gray-500 sm:text-base">
-            Welcome back to Kuraz Design Admin Panel
+          <p className="mt-1 text-sm text-gray-300 sm:text-base">
+            {t("admin.welcomeBackAdmin")}
           </p>
         </div>
 
-        <div className="rounded-xl bg-[#24312c] px-5 py-3 text-white shadow-lg">
-          <p className="text-xs text-gray-300">Today</p>
+        <div className="rounded-xl bg-[#1a3338] px-5 py-3 text-white shadow-lg border border-white/10">
+          <p className="text-xs text-gray-300">{t("admin.today")}</p>
 
-          <p className="font-semibold">Admin Overview</p>
+          <p className="font-semibold">{t("admin.adminOverview")}</p>
         </div>
       </div>
 
@@ -85,73 +87,75 @@ export default function Admin() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Products"
+          title={t("admin.totalProducts")}
           number={stats.products}
           icon={<FaBoxOpen />}
           loading={loading}
           bgGradient="from-blue-500 to-blue-600"
-          iconBg="bg-blue-100 text-blue-600"
-          numberColor="text-blue-700"
+          iconBg="bg-blue-500/20 text-blue-400"
+          numberColor="text-blue-400"
         />
 
         <StatCard
-          title="Orders"
+          title={t("admin.totalOrders")}
           number={stats.orders}
           icon={<FaShoppingBag />}
           loading={loading}
           bgGradient="from-purple-500 to-purple-600"
-          iconBg="bg-purple-100 text-purple-600"
-          numberColor="text-purple-700"
+          iconBg="bg-purple-500/20 text-purple-400"
+          numberColor="text-purple-400"
         />
 
         <StatCard
-          title="Customers"
+          title={t("admin.totalCustomers")}
           number={stats.users}
           icon={<FaUsers />}
           loading={loading}
           bgGradient="from-green-500 to-green-600"
-          iconBg="bg-green-100 text-green-600"
-          numberColor="text-green-700"
+          iconBg="bg-green-500/20 text-green-400"
+          numberColor="text-green-400"
         />
 
         <StatCard
-          title="Revenue"
+          title={t("admin.totalRevenue")}
           number={`${stats.revenue.toLocaleString()} ETB`}
           icon={<FaChartLine />}
           loading={loading}
           bgGradient="from-[#d4af37] to-[#b88f1d]"
-          iconBg="bg-yellow-100 text-yellow-600"
+          iconBg="bg-[#d4af37]/20 text-[#d4af37]"
           numberColor="text-[#d4af37]"
         />
       </div>
 
       {/* Quick Actions */}
 
-      <section className="mt-8">
-        <h2 className="mb-4 text-xl font-bold text-[#24312c]">Quick Actions</h2>
+      <section className="mt-6">
+        <h2 className="mb-4 text-xl font-bold text-white">
+          {t("admin.quickActions")}
+        </h2>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <ActionCard
             to="/admin/products"
             icon={<FaStore />}
-            title="Manage Products"
-            text="Create and manage your dress collection."
+            title={t("admin.manageProducts")}
+            text={t("admin.manageProductsDesc")}
             gradient="from-blue-600 to-blue-700"
           />
 
           <ActionCard
             to="/admin/orders"
             icon={<FaShoppingCart />}
-            title="Manage Orders"
-            text="Track customer orders and deliveries."
+            title={t("admin.manageOrders")}
+            text={t("admin.manageOrdersDesc")}
             gradient="from-purple-600 to-purple-700"
           />
 
           <ActionCard
             to="/admin/users"
             icon={<FaUserFriends />}
-            title="Manage Users"
-            text="View and control customer accounts."
+            title={t("admin.manageUsers")}
+            text={t("admin.manageUsersDesc")}
             gradient="from-green-600 to-green-700"
           />
         </div>
@@ -159,18 +163,20 @@ export default function Admin() {
 
       {/* Recent Activity */}
 
-      <section className="mt-8 rounded-2xl border bg-white p-5 shadow-sm sm:p-7">
+      <section className="mt-6 rounded-2xl border border-white/10 bg-white/10 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-7">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-[#24312c]">Recent Activity</h2>
+          <h2 className="text-xl font-bold text-white">
+            {t("admin.recentActivity")}
+          </h2>
 
           <button className="flex items-center gap-2 text-sm text-[#d4af37] transition hover:scale-105 hover:underline">
-            View all
+            {t("admin.viewAll")}
             <FaArrowRight />
           </button>
         </div>
 
-        <div className="flex min-h-40 items-center justify-center rounded-xl bg-gray-50 text-center text-sm text-gray-400">
-          No recent activity yet.
+        <div className="flex min-h-40 items-center justify-center rounded-xl bg-white/5 text-center text-sm text-gray-400">
+          {t("admin.noRecentActivity")}
         </div>
       </section>
     </div>
@@ -186,6 +192,8 @@ function StatCard({
   iconBg,
   numberColor,
 }) {
+  const { t } = useLanguage();
+
   return (
     <div
       className="
@@ -193,15 +201,16 @@ function StatCard({
       relative
       overflow-hidden
       rounded-2xl
-      bg-white
+      bg-white/10
       p-6
-      shadow-sm
+      shadow-[0_12px_40px_rgba(0,0,0,0.15)]
       transition-all
       duration-300
       hover:-translate-y-2
       hover:shadow-2xl
       border
-      border-gray-100
+      border-white/10
+      backdrop-blur-sm
     "
     >
       {/* Animated Gradient Background */}
@@ -209,7 +218,7 @@ function StatCard({
         className={`
           absolute inset-0 bg-gradient-to-br ${bgGradient}
           opacity-0 transition-opacity duration-500
-          group-hover:opacity-[0.04]
+          group-hover:opacity-[0.08]
         `}
       />
 
@@ -218,8 +227,8 @@ function StatCard({
         className={`
           absolute -right-8 -top-8 h-24 w-24 rounded-full
           bg-gradient-to-br ${bgGradient}
-          opacity-[0.03] transition-all duration-500
-          group-hover:scale-150 group-hover:opacity-[0.06]
+          opacity-[0.05] transition-all duration-500
+          group-hover:scale-150 group-hover:opacity-[0.1]
         `}
       />
 
@@ -235,19 +244,21 @@ function StatCard({
             <span className="text-2xl">{icon}</span>
           </div>
 
-          {/* Trend Indicator (optional) */}
-          <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
+          {/* Trend Indicator */}
+          <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-semibold text-green-400">
             +12%
           </span>
         </div>
 
         <div className="mt-5">
-          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <p className="text-sm font-medium text-gray-300">{title}</p>
 
           {loading ? (
             <div className="mt-1 flex items-center gap-2">
               <FaSpinner className="animate-spin text-[#d4af37]" />
-              <span className="text-sm text-gray-400">Loading...</span>
+              <span className="text-sm text-gray-400">
+                {t("common.loading")}
+              </span>
             </div>
           ) : (
             <h3
@@ -258,8 +269,8 @@ function StatCard({
           )}
         </div>
 
-        {/* Progress Bar (optional) */}
-        <div className="mt-4 h-1 w-full rounded-full bg-gray-100">
+        {/* Progress Bar */}
+        <div className="mt-4 h-1 w-full rounded-full bg-white/10">
           <div
             className={`
               h-1 rounded-full bg-gradient-to-r ${bgGradient}
@@ -274,6 +285,8 @@ function StatCard({
 }
 
 function ActionCard({ to, icon, title, text, gradient }) {
+  const { t } = useLanguage();
+
   return (
     <Link
       to={to}
@@ -283,6 +296,7 @@ function ActionCard({ to, icon, title, text, gradient }) {
         p-6 text-white
         transition-all duration-300
         hover:-translate-y-2 hover:shadow-2xl
+        border border-white/10
       `}
     >
       {/* Decorative Elements */}
@@ -308,7 +322,7 @@ function ActionCard({ to, icon, title, text, gradient }) {
         <p className="mt-2 text-sm text-white/80">{text}</p>
 
         <div className="mt-4 flex items-center gap-2 text-sm font-medium text-white/70 transition-all duration-300 group-hover:text-white group-hover:gap-3">
-          <span>Get Started</span>
+          <span>{t("admin.getStarted")}</span>
           <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
         </div>
       </div>

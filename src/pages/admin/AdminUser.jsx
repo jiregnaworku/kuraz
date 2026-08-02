@@ -13,8 +13,10 @@ import {
 
 import { getUsers, deleteUser, blockUser } from "../../api/userApi";
 import ConfirmModal from "../../components/profile/ConfirmModal";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Users() {
+  const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -63,7 +65,7 @@ export default function Users() {
       setSelectedUser(null);
     } catch (error) {
       console.error(error);
-      alert("Failed to delete user.");
+      alert(t("admin.failedToDelete") || "Failed to delete user.");
     }
   };
 
@@ -87,7 +89,7 @@ export default function Users() {
       setSelectedUser(null);
     } catch (error) {
       console.error(error);
-      alert("Failed to update user.");
+      alert(t("admin.failedToUpdate") || "Failed to update user.");
     }
   };
 
@@ -109,16 +111,18 @@ export default function Users() {
 
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#24312c]">User Management</h1>
+          <h1 className="text-3xl font-bold text-[#24312c]">
+            {t("admin.userManagement")}
+          </h1>
 
-          <p className="mt-1 text-gray-500">Manage all registered customers.</p>
+          <p className="mt-1 text-gray-500">{t("admin.userManagementDesc")}</p>
         </div>
 
         <div className="flex items-center gap-3 rounded-xl bg-[#24312c] px-6 py-4 text-white">
           <FaUsers />
 
           <div>
-            <p className="text-sm">Total Users</p>
+            <p className="text-sm">{t("admin.totalUsers")}</p>
             <h2 className="text-2xl font-bold">{users.length}</h2>
           </div>
         </div>
@@ -131,7 +135,7 @@ export default function Users() {
 
         <input
           type="text"
-          placeholder="Search by name, phone or email..."
+          placeholder={t("admin.searchUsers")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-xl border bg-white py-3 pl-11 pr-4 outline-none focus:border-[#d4af37]"
@@ -144,14 +148,16 @@ export default function Users() {
         <table className="w-full">
           <thead className="bg-[#24312c] text-white">
             <tr>
-              <th className="px-6 py-4 text-left">Name</th>
-              <th className="px-6 py-4 text-left">Phone</th>
-              <th className="px-6 py-4 text-left">Email</th>
-              <th className="px-6 py-4 text-left">Role</th>
-              <th className="px-6 py-4 text-left">Verified</th>
-              <th className="px-6 py-4 text-left">Status</th>
-              <th className="px-6 py-4 text-left">Joined</th>
-              <th className="px-6 py-4 text-center">Actions</th>
+              <th className="px-6 py-4 text-left">{t("admin.userName")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.userPhone")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.userEmail")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.role")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.verified")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.userStatus")}</th>
+              <th className="px-6 py-4 text-left">{t("admin.joined")}</th>
+              <th className="px-6 py-4 text-center">
+                {t("admin.userActions")}
+              </th>
             </tr>
           </thead>
 
@@ -159,7 +165,7 @@ export default function Users() {
             {filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan="8" className="py-12 text-center text-gray-500">
-                  No users found.
+                  {t("admin.noUsers")}
                 </td>
               </tr>
             ) : (
@@ -178,11 +184,11 @@ export default function Users() {
                   <td className="px-6 py-4">
                     {user.isVerified ? (
                       <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
-                        Verified
+                        {t("admin.verifiedStatus")}
                       </span>
                     ) : (
                       <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm text-yellow-700">
-                        Pending
+                        {t("admin.pendingStatus")}
                       </span>
                     )}
                   </td>
@@ -190,11 +196,11 @@ export default function Users() {
                   <td className="px-6 py-4">
                     {user.isBlocked ? (
                       <span className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
-                        Blocked
+                        {t("admin.blocked")}
                       </span>
                     ) : (
                       <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
-                        Active
+                        {t("admin.active")}
                       </span>
                     )}
                   </td>
@@ -209,7 +215,7 @@ export default function Users() {
 
                       <button
                         className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
-                        title="View"
+                        title={t("admin.view")}
                       >
                         <FaEye />
                       </button>
@@ -218,7 +224,7 @@ export default function Users() {
 
                       <button
                         className="rounded-lg bg-yellow-100 p-2 text-yellow-700 transition hover:bg-yellow-200"
-                        title="Edit"
+                        title={t("admin.edit")}
                       >
                         <FaEdit />
                       </button>
@@ -232,7 +238,9 @@ export default function Users() {
                             ? "bg-green-100 text-green-700 hover:bg-green-200"
                             : "bg-orange-100 text-orange-700 hover:bg-orange-200"
                         }`}
-                        title={user.isBlocked ? "Unblock User" : "Block User"}
+                        title={
+                          user.isBlocked ? t("admin.unblock") : t("admin.block")
+                        }
                       >
                         {user.isBlocked ? <FaCheck /> : <FaBan />}
                       </button>
@@ -242,7 +250,7 @@ export default function Users() {
                       <button
                         onClick={() => openDeleteModal(user)}
                         className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
-                        title="Delete User"
+                        title={t("admin.delete")}
                       >
                         <FaTrash />
                       </button>
@@ -263,10 +271,15 @@ export default function Users() {
           setShowDeleteModal(false);
           setSelectedUser(null);
         }}
-        title="Delete User"
-        message={`Are you sure you want to delete "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? This action cannot be undone. All their data will be permanently removed.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t("admin.deleteUser")}
+        message={t("admin.deleteUserConfirm", {
+          userName:
+            selectedUser?.fullName ||
+            selectedUser?.phone ||
+            t("admin.thisUser"),
+        })}
+        confirmText={t("admin.delete")}
+        cancelText={t("common.cancel")}
         type="danger"
         icon={<FaTrash className="text-3xl text-red-600" />}
       />
@@ -279,14 +292,30 @@ export default function Users() {
           setShowBlockModal(false);
           setSelectedUser(null);
         }}
-        title={selectedUser?.isBlocked ? "Unblock User" : "Block User"}
+        title={
+          selectedUser?.isBlocked
+            ? t("admin.unblockUser")
+            : t("admin.blockUser")
+        }
         message={
           selectedUser?.isBlocked
-            ? `Are you sure you want to unblock "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? They will be able to access their account again.`
-            : `Are you sure you want to block "${selectedUser?.fullName || selectedUser?.phone || "this user"}"? They will not be able to access their account.`
+            ? t("admin.unblockUserConfirm", {
+                userName:
+                  selectedUser?.fullName ||
+                  selectedUser?.phone ||
+                  t("admin.thisUser"),
+              })
+            : t("admin.blockUserConfirm", {
+                userName:
+                  selectedUser?.fullName ||
+                  selectedUser?.phone ||
+                  t("admin.thisUser"),
+              })
         }
-        confirmText={selectedUser?.isBlocked ? "Unblock" : "Block"}
-        cancelText="Cancel"
+        confirmText={
+          selectedUser?.isBlocked ? t("admin.unblock") : t("admin.block")
+        }
+        cancelText={t("common.cancel")}
         type={selectedUser?.isBlocked ? "info" : "danger"}
         icon={
           selectedUser?.isBlocked ? (

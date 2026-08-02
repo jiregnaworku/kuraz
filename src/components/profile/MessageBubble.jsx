@@ -1,6 +1,8 @@
 import { FaUserShield, FaUser } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function MessageBubble({ message }) {
+  const { t } = useLanguage();
   const isAdmin =
     message.sender?.role === "admin" || message.senderRole === "admin";
 
@@ -88,7 +90,7 @@ export default function MessageBubble({ message }) {
                   "
               />
 
-              <span>Kuraz Support</span>
+              <span>{t("messages.kurazSupport") || "Kuraz Support"}</span>
             </>
           ) : (
             <>
@@ -98,7 +100,7 @@ export default function MessageBubble({ message }) {
                   "
               />
 
-              <span>You</span>
+              <span>{t("messages.you") || "You"}</span>
             </>
           )}
         </div>

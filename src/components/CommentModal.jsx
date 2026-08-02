@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   FaTimes,
@@ -23,6 +23,7 @@ export default function CommentModal({
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [text, setText] = useState("");
+  const prevProductIdRef = useRef(null);
 
   // Reply states
   const [replyingTo, setReplyingTo] = useState(null);
@@ -31,18 +32,39 @@ export default function CommentModal({
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
+  // Stable reference to setCommentsCount
+  const setCommentsCountRef = useRef(setCommentsCount);
+  useEffect(() => {
+    setCommentsCountRef.current = setCommentsCount;
+  }, [setCommentsCount]);
+
+  // Update comment count helper
+  const updateCommentsCount = useCallback((count) => {
+    if (setCommentsCountRef.current) {
+      setCommentsCountRef.current(count);
+    }
+  }, []);
+
   // ==========================
   // Load Comments from Database
   // ==========================
   useEffect(() => {
     if (!open || !productId) return;
 
+    // Check if productId changed - using ref to avoid state update in effect
+    if (prevProductIdRef.current !== productId) {
+      prevProductIdRef.current = productId;
+      setComments([]);
+    }
+
     let isMounted = true;
 
     const fetchComments = async () => {
       try {
         setLoading(true);
+        console.log("Fetching comments for product:", productId);
         const data = await getComments(productId);
+        console.log("Received data:", data);
 
         // Handle different possible response shapes from the backend
         let commentsList = [];
@@ -54,18 +76,23 @@ export default function CommentModal({
           commentsList = data.data;
         } else if (Array.isArray(data?.data?.comments)) {
           commentsList = data.data.comments;
+        } else if (data?.comment) {
+          commentsList = [data.comment];
+        } else if (data?.data?.comment) {
+          commentsList = [data.data.comment];
         }
+
+        console.log("Processed comments:", commentsList);
 
         if (isMounted) {
           setComments(commentsList);
-          if (setCommentsCount) {
-            setCommentsCount(commentsList.length);
-          }
+          updateCommentsCount(commentsList.length);
         }
       } catch (err) {
-        console.error("Failed to load comments:", err);
+        console.error("Failed to load comments for product:", productId, err);
         if (isMounted) {
           setComments([]);
+          updateCommentsCount(0);
         }
       } finally {
         if (isMounted) {
@@ -79,7 +106,7 @@ export default function CommentModal({
     return () => {
       isMounted = false;
     };
-  }, [open, productId, setCommentsCount]);
+  }, [open, productId, updateCommentsCount]); // Removed prevProductId dependency
 
   // ==========================
   // ESC closes modal + lock body scroll
@@ -118,11 +145,11 @@ export default function CommentModal({
       const data = await addComment(productId, text.trim());
       const newComment = data.comment || data.data || data;
 
-      setComments((prev) => [newComment, ...prev]);
-
-      if (setCommentsCount) {
-        setCommentsCount((prev) => prev + 1);
-      }
+      setComments((prev) => {
+        const updated = [newComment, ...prev];
+        updateCommentsCount(updated.length);
+        return updated;
+      });
       setText("");
     } catch (err) {
       console.error("Failed to add comment:", err);
@@ -148,11 +175,11 @@ export default function CommentModal({
       const data = await addComment(productId, replyText.trim(), parentId);
       const newComment = data.comment || data.data || data;
 
-      setComments((prev) => [newComment, ...prev]);
-
-      if (setCommentsCount) {
-        setCommentsCount((prev) => prev + 1);
-      }
+      setComments((prev) => {
+        const updated = [newComment, ...prev];
+        updateCommentsCount(updated.length);
+        return updated;
+      });
       setReplyText("");
       setReplyingTo(null);
     } catch (err) {
@@ -173,22 +200,30 @@ export default function CommentModal({
 
     try {
       await deleteComment(id);
-      setComments((prev) => prev.filter((item) => item._id !== id));
-
-      if (setCommentsCount) {
-        setCommentsCount((prev) => Math.max(prev - 1, 0));
-      }
+      setComments((prev) => {
+        const updated = prev.filter((item) => item._id !== id);
+        updateCommentsCount(updated.length);
+        return updated;
+      });
     } catch (err) {
       console.error("Failed to delete comment:", err);
       alert(err.response?.data?.message || "Unable to delete comment.");
     }
   };
 
+  // Reset reply state when modal closes
+  const handleClose = useCallback(() => {
+    setReplyingTo(null);
+    setReplyText("");
+    setText("");
+    onClose();
+  }, [onClose]);
+
   if (!open) return null;
 
   return createPortal(
     <div
-      onClick={onClose}
+      onClick={handleClose}
       className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4 transition-opacity duration-300"
     >
       {/* Modal panel */}
@@ -218,7 +253,7 @@ export default function CommentModal({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onClose();
+              handleClose();
             }}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors"
             aria-label="Close modal"

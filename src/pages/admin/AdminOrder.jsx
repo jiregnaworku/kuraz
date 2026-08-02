@@ -19,8 +19,10 @@ import {
 import { getOrders, updateOrderStatus } from "../../api/OrderApi";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../components/profile/ConfirmModal";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Orders() {
+  const { t } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,11 +60,11 @@ export default function Orders() {
       setFilteredOrders(data || []);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load orders");
+      toast.error(t("admin.failedToLoad") || "Failed to load orders");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -127,7 +129,9 @@ export default function Orders() {
   const openStatusModal = (order, newStatus) => {
     // Don't show modal if status is the same
     if (order.orderStatus === newStatus) {
-      toast.info(`Order is already ${newStatus}`);
+      toast.info(
+        `${t("admin.orderAlready") || "Order is already"} ${newStatus}`,
+      );
       return;
     }
 
@@ -145,14 +149,18 @@ export default function Orders() {
 
     try {
       await updateOrderStatus(selectedOrder._id, { status: pendingStatus });
-      toast.success(`Order status updated to ${pendingStatus}`);
+      toast.success(
+        `${t("admin.orderStatusUpdated") || "Order status updated to"} ${pendingStatus}`,
+      );
       setShowStatusModal(false);
       setSelectedOrder(null);
       setPendingStatus("");
       fetchOrders();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update order status");
+      toast.error(
+        t("admin.failedToUpdateStatus") || "Failed to update order status",
+      );
     }
   };
 
@@ -252,66 +260,68 @@ export default function Orders() {
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-[#d4af37] border-t-transparent"></div>
-          <p className="mt-4 text-gray-500">Loading orders...</p>
+          <p className="mt-4 text-gray-500">{t("common.loading")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f5f6f8] to-[#e8e9ec] px-4 pt-28 pb-10 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#f5f6f8] to-[#e8e9ec] px-4 pt-16 pb-10 sm:px-6 lg:px-10">
       {/* Header with Stats */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#24312c]">
-              Orders Management
+              {t("admin.ordersManagement")}
             </h1>
             <p className="mt-1 text-gray-500">
-              Manage and track all customer orders
+              {t("admin.ordersManagementDesc")}
             </p>
           </div>
 
           <div className="flex gap-3">
             <button className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
-              <FaPrint /> Print
+              <FaPrint /> {t("admin.print") || "Print"}
             </button>
             <button className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
-              <FaDownload /> Export
+              <FaDownload /> {t("admin.export") || "Export"}
             </button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs text-gray-500">Total Orders</p>
+            <p className="text-xs text-gray-500">
+              {t("admin.totalOrdersLabel")}
+            </p>
             <p className="text-2xl font-bold text-[#24312c]">{stats.total}</p>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs text-gray-500">Pending</p>
+            <p className="text-xs text-gray-500">{t("admin.pending")}</p>
             <p className="text-2xl font-bold text-yellow-600">
               {stats.pending}
             </p>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs text-gray-500">Shipping</p>
+            <p className="text-xs text-gray-500">{t("admin.shipping")}</p>
             <p className="text-2xl font-bold text-indigo-600">
               {stats.shipping}
             </p>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs text-gray-500">Delivered</p>
+            <p className="text-xs text-gray-500">{t("admin.delivered")}</p>
             <p className="text-2xl font-bold text-green-600">
               {stats.delivered}
             </p>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <p className="text-xs text-gray-500">Cancelled</p>
+            <p className="text-xs text-gray-500">{t("admin.cancelled")}</p>
             <p className="text-2xl font-bold text-red-600">{stats.cancelled}</p>
           </div>
           <div className="rounded-2xl bg-gradient-to-r from-[#d4af37] to-[#b88f1d] p-4 text-white shadow-sm">
-            <p className="text-xs text-white/80">Revenue</p>
+            <p className="text-xs text-white/80">{t("admin.revenue")}</p>
             <p className="text-2xl font-bold">
               {stats.totalRevenue.toLocaleString()} ETB
             </p>
@@ -320,7 +330,7 @@ export default function Orders() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-3">
           {statusOptions.map((status) => (
             <button
@@ -332,7 +342,7 @@ export default function Orders() {
                   : "bg-white text-gray-600 hover:bg-gray-50"
               }`}
             >
-              {status}
+              {t(`admin.status_${status.toLowerCase()}`) || status}
             </button>
           ))}
         </div>
@@ -341,7 +351,7 @@ export default function Orders() {
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search orders..."
+            placeholder={t("admin.searchOrders") || "Search orders..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-[#d4af37] focus:outline-none sm:w-64"
@@ -356,20 +366,20 @@ export default function Orders() {
             <thead className="bg-[#24312c]">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                  Order #
+                  {t("admin.orderNumber")}
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                  Customer
+                  {t("admin.customer")}
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                  Product
+                  {t("admin.product")}
                 </th>
                 <th
                   className="px-6 py-4 text-left text-sm font-semibold text-white cursor-pointer hover:text-[#d4af37]"
                   onClick={() => toggleSort("totalPrice")}
                 >
                   <div className="flex items-center gap-1">
-                    Price
+                    {t("admin.price")}
                     {sortConfig.key === "totalPrice" &&
                       (sortConfig.direction === "asc" ? (
                         <FaChevronUp />
@@ -379,17 +389,17 @@ export default function Orders() {
                   </div>
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                  Payment
+                  {t("admin.payment")}
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-white">
-                  Status
+                  {t("admin.status")}
                 </th>
                 <th
                   className="px-6 py-4 text-left text-sm font-semibold text-white cursor-pointer hover:text-[#d4af37]"
                   onClick={() => toggleSort("createdAt")}
                 >
                   <div className="flex items-center gap-1">
-                    Date
+                    {t("admin.date")}
                     {sortConfig.key === "createdAt" &&
                       (sortConfig.direction === "asc" ? (
                         <FaChevronUp />
@@ -399,7 +409,7 @@ export default function Orders() {
                   </div>
                 </th>
                 <th className="px-6 py-4 text-center text-sm font-semibold text-white">
-                  Actions
+                  {t("admin.actions")}
                 </th>
               </tr>
             </thead>
@@ -409,7 +419,7 @@ export default function Orders() {
                 <tr>
                   <td colSpan={8} className="py-16 text-center text-gray-500">
                     <FaShoppingBag className="mx-auto mb-4 text-4xl text-gray-300" />
-                    <p>No orders found</p>
+                    <p>{t("admin.noOrders")}</p>
                   </td>
                 </tr>
               ) : (
@@ -467,7 +477,8 @@ export default function Orders() {
                         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(order.orderStatus)}`}
                       >
                         {getStatusIcon(order.orderStatus)}
-                        {order.orderStatus}
+                        {t(`admin.status_${order.orderStatus.toLowerCase()}`) ||
+                          order.orderStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
@@ -478,7 +489,7 @@ export default function Orders() {
                         <button
                           onClick={() => openStatusModal(order, "Accepted")}
                           className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Accepted")}`}
-                          title="Accept"
+                          title={t("admin.accept")}
                           disabled={
                             order.orderStatus === "Accepted" ||
                             order.orderStatus === "Cancelled" ||
@@ -490,7 +501,7 @@ export default function Orders() {
                         <button
                           onClick={() => openStatusModal(order, "Preparing")}
                           className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Preparing")}`}
-                          title="Prepare"
+                          title={t("admin.prepare")}
                           disabled={
                             order.orderStatus === "Cancelled" ||
                             order.orderStatus === "Delivered"
@@ -501,7 +512,7 @@ export default function Orders() {
                         <button
                           onClick={() => openStatusModal(order, "Shipping")}
                           className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Shipping")}`}
-                          title="Ship"
+                          title={t("admin.ship")}
                           disabled={
                             order.orderStatus === "Cancelled" ||
                             order.orderStatus === "Delivered"
@@ -512,7 +523,7 @@ export default function Orders() {
                         <button
                           onClick={() => openStatusModal(order, "Delivered")}
                           className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Delivered")}`}
-                          title="Deliver"
+                          title={t("admin.deliver")}
                           disabled={
                             order.orderStatus === "Cancelled" ||
                             order.orderStatus === "Delivered"
@@ -523,7 +534,7 @@ export default function Orders() {
                         <button
                           onClick={() => openStatusModal(order, "Cancelled")}
                           className={`rounded-lg p-2 transition hover:scale-105 ${getStatusButtonStyle("Cancelled")}`}
-                          title="Cancel"
+                          title={t("admin.cancel")}
                           disabled={
                             order.orderStatus === "Cancelled" ||
                             order.orderStatus === "Delivered"
@@ -546,7 +557,7 @@ export default function Orders() {
         {filteredOrders.length === 0 ? (
           <div className="rounded-3xl bg-white p-8 text-center shadow">
             <FaShoppingBag className="mx-auto mb-4 text-4xl text-gray-300" />
-            <p className="text-gray-500">No orders found</p>
+            <p className="text-gray-500">{t("admin.noOrders")}</p>
           </div>
         ) : (
           filteredOrders.map((order) => (
@@ -565,7 +576,8 @@ export default function Orders() {
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(order.orderStatus)}`}
                 >
                   {getStatusIcon(order.orderStatus)}
-                  {order.orderStatus}
+                  {t(`admin.status_${order.orderStatus.toLowerCase()}`) ||
+                    order.orderStatus}
                 </span>
               </div>
 
@@ -583,7 +595,8 @@ export default function Orders() {
                     {order.product?.name || order.productName}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    {order.size} • {order.color} • Qty: {order.quantity}
+                    {order.size} • {order.color} •{" "}
+                    {t("admin.quantity") || "Qty"}: {order.quantity}
                   </p>
                 </div>
               </div>
@@ -609,7 +622,9 @@ export default function Orders() {
               {/* Order Footer */}
               <div className="mt-3 flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total</p>
+                  <p className="text-sm text-gray-500">
+                    {t("admin.totalAmount") || "Total"}
+                  </p>
                   <p className="text-xl font-bold text-[#d4af37]">
                     {Number(order.totalPrice).toLocaleString()} ETB
                   </p>
@@ -636,7 +651,7 @@ export default function Orders() {
                     order.orderStatus === "Delivered"
                   }
                 >
-                  Accept
+                  {t("admin.accept")}
                 </button>
                 <button
                   onClick={() => openStatusModal(order, "Preparing")}
@@ -646,7 +661,7 @@ export default function Orders() {
                     order.orderStatus === "Delivered"
                   }
                 >
-                  Prepare
+                  {t("admin.prepare")}
                 </button>
                 <button
                   onClick={() => openStatusModal(order, "Shipping")}
@@ -656,7 +671,7 @@ export default function Orders() {
                     order.orderStatus === "Delivered"
                   }
                 >
-                  Ship
+                  {t("admin.ship")}
                 </button>
                 <button
                   onClick={() => openStatusModal(order, "Delivered")}
@@ -666,7 +681,7 @@ export default function Orders() {
                     order.orderStatus === "Delivered"
                   }
                 >
-                  Deliver
+                  {t("admin.deliver")}
                 </button>
                 <button
                   onClick={() => openStatusModal(order, "Cancelled")}
@@ -676,7 +691,7 @@ export default function Orders() {
                     order.orderStatus === "Delivered"
                   }
                 >
-                  Cancel
+                  {t("admin.cancel")}
                 </button>
               </div>
             </div>
@@ -689,14 +704,28 @@ export default function Orders() {
         isOpen={showStatusModal}
         onConfirm={handleStatusChange}
         onCancel={cancelStatusChange}
-        title={`Change Order Status to ${pendingStatus}`}
+        title={
+          t("admin.changeStatusTo", { status: pendingStatus }) ||
+          `Change Order Status to ${pendingStatus}`
+        }
         message={
           pendingStatus === "Cancelled"
-            ? `Are you sure you want to cancel order #${selectedOrder?.orderNumber || "N/A"}? This action cannot be undone.`
-            : `Are you sure you want to change order #${selectedOrder?.orderNumber || "N/A"} status from "${selectedOrder?.orderStatus}" to "${pendingStatus}"?`
+            ? t("admin.cancelOrderConfirm", {
+                orderNumber: selectedOrder?.orderNumber || "N/A",
+              }) ||
+              `Are you sure you want to cancel order #${selectedOrder?.orderNumber || "N/A"}? This action cannot be undone.`
+            : t("admin.changeStatusConfirm", {
+                orderNumber: selectedOrder?.orderNumber || "N/A",
+                oldStatus: selectedOrder?.orderStatus || "",
+                newStatus: pendingStatus || "",
+              }) ||
+              `Are you sure you want to change order #${selectedOrder?.orderNumber || "N/A"} status from "${selectedOrder?.orderStatus}" to "${pendingStatus}"?`
         }
-        confirmText={`Change to ${pendingStatus}`}
-        cancelText="Cancel"
+        confirmText={
+          t("admin.changeTo", { status: pendingStatus }) ||
+          `Change to ${pendingStatus}`
+        }
+        cancelText={t("common.cancel")}
         type={pendingStatus === "Cancelled" ? "danger" : "warning"}
         icon={
           pendingStatus === "Cancelled" ? (
@@ -711,9 +740,9 @@ export default function Orders() {
 
       {/* Pagination (if needed) */}
       {filteredOrders.length > 10 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
+        <div className="mt-6 flex items-center justify-center gap-2">
           <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm transition hover:bg-gray-50">
-            Previous
+            {t("admin.previous") || "Previous"}
           </button>
           <button className="rounded-lg bg-[#d4af37] px-4 py-2 text-sm font-medium text-white">
             1
@@ -725,7 +754,7 @@ export default function Orders() {
             3
           </button>
           <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm transition hover:bg-gray-50">
-            Next
+            {t("admin.next") || "Next"}
           </button>
         </div>
       )}

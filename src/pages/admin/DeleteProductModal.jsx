@@ -1,4 +1,5 @@
 import { FaTrash, FaTimes } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function DeleteProductModal({
   product,
@@ -6,6 +7,8 @@ export default function DeleteProductModal({
   onConfirm,
   loading,
 }) {
+  const { t } = useLanguage();
+
   if (!product) return null;
 
   return (
@@ -20,7 +23,9 @@ export default function DeleteProductModal({
         {/* Header */}
 
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-[#24312c]">Delete Product</h2>
+          <h2 className="text-2xl font-bold text-[#24312c]">
+            {t("admin.deleteProduct")}
+          </h2>
 
           <button
             onClick={onClose}
@@ -34,7 +39,8 @@ export default function DeleteProductModal({
 
         <div className="mb-8">
           <p className="text-gray-600">
-            Are you sure you want to delete this product?
+            {t("admin.deleteProductConfirm", { productName: product.name }) ||
+              `Are you sure you want to delete "${product.name}"?`}
           </p>
 
           <div className="mt-5 rounded-2xl border bg-gray-50 p-4">
@@ -58,7 +64,7 @@ export default function DeleteProductModal({
           </div>
 
           <p className="mt-5 text-sm text-red-500">
-            This action cannot be undone.
+            {t("admin.deleteWarning") || "This action cannot be undone."}
           </p>
         </div>
 
@@ -70,7 +76,7 @@ export default function DeleteProductModal({
             disabled={loading}
             className="rounded-xl border border-gray-300 px-6 py-3 font-semibold transition hover:bg-gray-100 disabled:opacity-50"
           >
-            Cancel
+            {t("common.cancel")}
           </button>
 
           <button
@@ -80,7 +86,9 @@ export default function DeleteProductModal({
           >
             <FaTrash />
 
-            {loading ? "Deleting..." : "Delete Product"}
+            {loading
+              ? t("common.deleting") || "Deleting..."
+              : t("admin.deleteProduct")}
           </button>
         </div>
       </div>

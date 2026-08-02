@@ -1,6 +1,7 @@
 // components/common/ConfirmModal.jsx
 import { useEffect, useRef } from "react";
 import { FaExclamationTriangle, FaTimes, FaTrash } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ConfirmModal({
   isOpen = true,
@@ -15,6 +16,7 @@ export default function ConfirmModal({
   icon = null,
   showCloseButton = true,
 }) {
+  const { t } = useLanguage();
   const modalRef = useRef(null);
 
   // Close on escape key
@@ -100,6 +102,20 @@ export default function ConfirmModal({
 
   const styles = getTypeStyles();
 
+  // Use translations if provided, otherwise use props
+  const finalTitle =
+    title === "Are you sure?" ? t("common.areYouSure") || title : title;
+  const finalMessage =
+    message === "This action cannot be undone."
+      ? t("common.actionCannotBeUndone") || message
+      : message;
+  const finalConfirmText =
+    confirmText === "Confirm"
+      ? t("common.confirm") || confirmText
+      : confirmText;
+  const finalCancelText =
+    cancelText === "Cancel" ? t("common.cancel") || cancelText : cancelText;
+
   return (
     <div
       className="
@@ -175,7 +191,7 @@ export default function ConfirmModal({
               text-[#24312c]
             "
           >
-            {title}
+            {finalTitle}
           </h2>
 
           {/* Message */}
@@ -185,7 +201,7 @@ export default function ConfirmModal({
               text-gray-500
             "
           >
-            {message}
+            {finalMessage}
           </p>
 
           {/* Buttons */}
@@ -212,7 +228,7 @@ export default function ConfirmModal({
                 hover:bg-gray-100
               "
             >
-              {cancelText}
+              {finalCancelText}
             </button>
 
             <button
@@ -228,7 +244,7 @@ export default function ConfirmModal({
                 ${styles.buttonBg}
               `}
             >
-              {confirmText}
+              {finalConfirmText}
             </button>
           </div>
         </div>

@@ -4,8 +4,11 @@ import {
   FaBullhorn,
   FaInfoCircle,
 } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function NotificationCard({ notification }) {
+  const { t } = useLanguage();
+
   const getIcon = () => {
     switch (notification.type) {
       case "order":
@@ -20,6 +23,17 @@ export default function NotificationCard({ notification }) {
       default:
         return <FaInfoCircle />;
     }
+  };
+
+  const getTypeTranslation = (type) => {
+    const typeMap = {
+      order: t("notification.typeOrder") || "Order",
+      payment: t("notification.typePayment") || "Payment",
+      promotion: t("notification.typePromotion") || "Promotion",
+      message: t("notification.typeMessage") || "Message",
+      system: t("notification.typeSystem") || "System",
+    };
+    return typeMap[type] || type;
   };
 
   return (
@@ -102,9 +116,15 @@ export default function NotificationCard({ notification }) {
           {notification.message}
         </p>
 
+        <div className="mt-2 flex items-center gap-3">
+          <span className="text-[10px] font-medium text-[#d4af37] bg-[#d4af37]/10 px-2 py-0.5 rounded-full">
+            {getTypeTranslation(notification.type)}
+          </span>
+        </div>
+
         <p
           className="
-          mt-3
+          mt-2
           text-xs
           text-gray-400
           "

@@ -14,28 +14,102 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Sidebar from "../../components/profile/Sidebar";
-import ConfirmModal from "../../components/profile/ConfirmModal"; // Import the modal
+import ConfirmModal from "../../components/profile/ConfirmModal";
+import { getNotifications } from "../../api/notificationApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Profile() {
+  const { t } = useLanguage();
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // Add this state
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Add state for unread counts
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   // Only true on /profile, not /profile/orders etc.
   const isMainProfile = location.pathname === "/profile";
 
+  // Fetch unread counts for mobile menu
+  useEffect(() => {
+    const fetchUnreadCounts = async () => {
+      const token = localStorage.getItem("token");
+      const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+
+      if (!token || !currentUser) {
+        setUnreadNotifications(0);
+        setUnreadMessages(0);
+        return;
+      }
+
+      try {
+        const response = await getNotifications();
+
+        let notificationsList = [];
+        if (response?.notifications) {
+          notificationsList = response.notifications;
+        } else if (response?.data) {
+          notificationsList = response.data;
+        } else if (Array.isArray(response)) {
+          notificationsList = response;
+        }
+
+        const currentUserId = currentUser._id || currentUser.id;
+
+        // Filter for current user
+        const userNotifications = notificationsList.filter((n) => {
+          if (!n) return false;
+          const notificationUserId =
+            n.user?._id ||
+            n.user?.id ||
+            n.userId ||
+            n.recipient?._id ||
+            n.recipient?.id ||
+            n.recipientId;
+
+          if (!notificationUserId) return true;
+          return notificationUserId.toString() === currentUserId.toString();
+        });
+
+        const unreadNotifs = userNotifications.filter(
+          (n) => n && !n.isRead,
+        ).length;
+
+        setUnreadNotifications(unreadNotifs);
+
+        // If you have messages API, fetch unread messages count here
+        setUnreadMessages(0); // Replace with actual messages count
+      } catch (error) {
+        console.error("Error fetching notification count:", error);
+        setUnreadNotifications(0);
+        setUnreadMessages(0);
+      }
+    };
+
+    fetchUnreadCounts();
+
+    // Set up polling every 30 seconds
+    const interval = setInterval(fetchUnreadCounts, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Get page title based on route
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === "/profile") return "Dashboard";
-    if (path === "/profile/orders") return "My Orders";
-    if (path === "/profile/messages") return "Messages";
-    if (path === "/profile/notifications") return "Notifications";
-    if (path === "/profile/settings") return "Settings";
+    if (path === "/profile") return t("profile.dashboard") || "Dashboard";
+    if (path === "/profile/orders") return t("profile.myOrders") || "My Orders";
+    if (path === "/profile/messages")
+      return t("profile.messages") || "Messages";
+    if (path === "/profile/notifications")
+      return t("profile.notifications") || "Notifications";
+    if (path === "/profile/settings")
+      return t("profile.settings") || "Settings";
     return "";
   };
 
@@ -66,13 +140,15 @@ export default function Profile() {
     <section
       className="
       min-h-screen
-      bg-[radial-gradient(circle_at_top,_rgba(212,175,55,0.12),_transparent_35%),linear-gradient(135deg,_#f8f4eb_0%,_#fcfbf8_45%,_#eef3ee_100%)]
+      bg-[#224248]
       relative
       overflow-hidden
       "
     >
-      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-[#d4af37]/10 blur-3xl"></div>
-      <div className="pointer-events-none absolute -right-24 top-1/2 h-80 w-80 rounded-full bg-[#24312c]/5 blur-3xl"></div>
+      {/* Decorative Elements - Updated to match the new dark background */}
+      <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-[#d4af37]/5 blur-3xl"></div>
+      <div className="pointer-events-none absolute -right-24 top-1/2 h-80 w-80 rounded-full bg-[#d4af37]/5 blur-3xl"></div>
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[#d4af37]/5 blur-3xl"></div>
 
       {/* Back to Home Button - Mobile only */}
       <div className="absolute left-4 top-4 z-10 sm:left-6 sm:top-6 lg:hidden">
@@ -80,15 +156,15 @@ export default function Profile() {
           to="/#home"
           className="
             group flex items-center gap-2 rounded-full 
-            border border-white/70 bg-white/85 px-4 py-2 text-sm font-medium 
-            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
-            transition-all duration-300 hover:bg-white 
-            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
+            border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium 
+            text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md
+            transition-all duration-300 hover:bg-white/20 
+            hover:shadow-[0_14px_40px_rgba(0,0,0,0.3)] hover:scale-105
             sm:px-5 sm:py-2.5 sm:text-base
           "
         >
           <FaHome className="text-[#d4af37] transition-transform duration-300 group-hover:scale-110" />
-          <span className="hidden sm:inline">Home</span>
+          <span className="hidden sm:inline">{t("nav.home")}</span>
           <span className="sm:hidden">
             <IoMdArrowBack className="text-[#d4af37]" />
           </span>
@@ -101,14 +177,14 @@ export default function Profile() {
           to="/#home"
           className="
             group flex items-center gap-2 rounded-full 
-            border border-white/70 bg-white/85 px-5 py-2.5 text-sm font-medium 
-            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
-            transition-all duration-300 hover:bg-white 
-            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
+            border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium 
+            text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md
+            transition-all duration-300 hover:bg-white/20 
+            hover:shadow-[0_14px_40px_rgba(0,0,0,0.3)] hover:scale-105
           "
         >
           <FaHome className="text-[#d4af37] transition-transform duration-300 group-hover:scale-110" />
-          <span>Home</span>
+          <span>{t("nav.home")}</span>
         </Link>
       </div>
 
@@ -117,22 +193,30 @@ export default function Profile() {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="
-            group flex items-center gap-2 rounded-full 
-            border border-white/70 bg-white/85 px-4 py-2 text-sm font-medium 
-            text-[#24312c] shadow-[0_10px_30px_rgba(36,49,44,0.12)] backdrop-blur-md
-            transition-all duration-300 hover:bg-white 
-            hover:shadow-[0_14px_40px_rgba(36,49,44,0.16)] hover:scale-105
+            group relative flex items-center gap-2 rounded-full 
+            border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium 
+            text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-md
+            transition-all duration-300 hover:bg-white/20 
+            hover:shadow-[0_14px_40px_rgba(0,0,0,0.3)] hover:scale-105
           "
         >
           {mobileMenuOpen ? (
             <>
               <FaTimes className="text-[#d4af37] text-lg" />
-              <span>Close</span>
+              <span>{t("profile.close") || "Close"}</span>
             </>
           ) : (
             <>
               <FaBars className="text-[#d4af37] text-lg" />
-              <span>Menu</span>
+              <span>{t("profile.menu") || "Menu"}</span>
+              {/* Combined badge for mobile menu button */}
+              {(unreadNotifications > 0 || unreadMessages > 0) && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {unreadNotifications + unreadMessages > 9
+                    ? "9+"
+                    : unreadNotifications + unreadMessages}
+                </span>
+              )}
             </>
           )}
         </button>
@@ -141,7 +225,7 @@ export default function Profile() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         ></div>
       )}
@@ -149,14 +233,14 @@ export default function Profile() {
       {/* Mobile Menu - Slides from Right */}
       <div
         className={`
-          fixed right-0 top-0 z-40 h-full w-80 transform bg-white shadow-2xl 
+          fixed right-0 top-0 z-40 h-full w-80 transform bg-[#1a3338] shadow-2xl 
           transition-transform duration-300 ease-in-out lg:hidden
           ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"}
         `}
       >
         <div className="flex h-full flex-col">
           {/* Mobile Menu Header */}
-          <div className="relative border-b border-gray-100 p-6">
+          <div className="relative border-b border-white/10 p-6">
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="absolute right-4 top-4 text-gray-400 hover:text-[#d4af37] transition-colors"
@@ -169,17 +253,17 @@ export default function Profile() {
                 <FaUser />
               </div>
               <div>
-                <h3 className="font-bold text-[#24312c]">
-                  {user?.fullName || "Customer"}
+                <h3 className="font-bold text-white">
+                  {user?.fullName || t("profile.customer") || "Customer"}
                 </h3>
-                <p className="text-sm text-gray-500">
-                  {user?.email || "No email"}
+                <p className="text-sm text-gray-300">
+                  {user?.email || t("profile.noEmail") || "No email"}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Mobile Menu Items */}
+          {/* Mobile Menu Items - FIXED with dynamic badges */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-2">
             {/* Profile */}
             <Link
@@ -191,15 +275,15 @@ export default function Profile() {
                 ${
                   location.pathname === "/profile"
                     ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-[#24312c] hover:bg-[#f8f4eb] hover:text-[#d4af37]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
               `}
             >
               <FaUser className="text-lg" />
-              <span className="font-medium">Profile</span>
+              <span className="font-medium">{t("profile.profile")}</span>
               {location.pathname === "/profile" && (
                 <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                  Active
+                  {t("profile.active")}
                 </span>
               )}
             </Link>
@@ -214,20 +298,20 @@ export default function Profile() {
                 ${
                   location.pathname === "/profile/orders"
                     ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-[#24312c] hover:bg-[#f8f4eb] hover:text-[#d4af37]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
               `}
             >
               <FaShoppingBag className="text-lg" />
-              <span className="font-medium">My Orders</span>
+              <span className="font-medium">{t("profile.myOrders")}</span>
               {location.pathname === "/profile/orders" && (
                 <span className="ml-auto text-xs bg-white/20 px-2 py-0.5 rounded-full">
-                  Active
+                  {t("profile.active")}
                 </span>
               )}
             </Link>
 
-            {/* Messages */}
+            {/* Messages - FIXED: Dynamic badge */}
             <Link
               to="/profile/messages"
               onClick={() => setMobileMenuOpen(false)}
@@ -237,18 +321,24 @@ export default function Profile() {
                 ${
                   location.pathname === "/profile/messages"
                     ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-[#24312c] hover:bg-[#f8f4eb] hover:text-[#d4af37]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
               `}
             >
               <FaCommentDots className="text-lg" />
-              <span className="font-medium">Messages</span>
-              <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                3
-              </span>
+              <span className="font-medium">{t("profile.messages")}</span>
+              {unreadMessages > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {unreadMessages > 99
+                    ? "99+"
+                    : unreadMessages > 9
+                      ? "9+"
+                      : unreadMessages}
+                </span>
+              )}
             </Link>
 
-            {/* Notifications */}
+            {/* Notifications - FIXED: Dynamic badge */}
             <Link
               to="/profile/notifications"
               onClick={() => setMobileMenuOpen(false)}
@@ -258,15 +348,21 @@ export default function Profile() {
                 ${
                   location.pathname === "/profile/notifications"
                     ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-[#24312c] hover:bg-[#f8f4eb] hover:text-[#d4af37]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
               `}
             >
               <FaBell className="text-lg" />
-              <span className="font-medium">Notifications</span>
-              <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                5
-              </span>
+              <span className="font-medium">{t("profile.notifications")}</span>
+              {unreadNotifications > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {unreadNotifications > 99
+                    ? "99+"
+                    : unreadNotifications > 9
+                      ? "9+"
+                      : unreadNotifications}
+                </span>
+              )}
             </Link>
 
             {/* Settings */}
@@ -279,33 +375,33 @@ export default function Profile() {
                 ${
                   location.pathname === "/profile/settings"
                     ? "bg-[#d4af37] text-white shadow-lg"
-                    : "text-[#24312c] hover:bg-[#f8f4eb] hover:text-[#d4af37]"
+                    : "text-gray-200 hover:bg-white/10 hover:text-[#d4af37]"
                 }
               `}
             >
               <FaCog className="text-lg" />
-              <span className="font-medium">Settings</span>
+              <span className="font-medium">{t("profile.settings")}</span>
             </Link>
 
             {/* Divider */}
-            <div className="my-4 border-t border-gray-100"></div>
+            <div className="my-4 border-t border-white/10"></div>
 
-            {/* Logout Button - Updated to use modal */}
+            {/* Logout Button */}
             <button
               onClick={() => setShowLogoutModal(true)}
               className="
                 flex w-full items-center gap-4 rounded-xl px-4 py-3 
-                text-red-500 transition-all duration-200
-                hover:bg-red-50 hover:text-red-600
+                text-red-400 transition-all duration-200
+                hover:bg-red-500/20 hover:text-red-300
               "
             >
               <FaSignOutAlt className="text-lg" />
-              <span className="font-medium">Logout</span>
+              <span className="font-medium">{t("profile.logout")}</span>
             </button>
           </nav>
 
           {/* Mobile Menu Footer */}
-          <div className="border-t border-gray-100 p-4">
+          <div className="border-t border-white/10 p-4">
             <p className="text-center text-xs text-gray-400">
               © 2026 Your Store
             </p>
@@ -340,11 +436,11 @@ export default function Profile() {
           overflow-hidden
           rounded-[2rem]
           border
-          border-white/30
-          bg-white/55
+          border-white/10
+          bg-white/10
           p-4
-          shadow-[0_24px_80px_rgba(36,49,44,0.12)]
-          backdrop-blur-2xl
+          shadow-[0_24px_80px_rgba(0,0,0,0.2)]
+          backdrop-blur-xl
 
           sm:p-6
           lg:p-8
@@ -353,16 +449,16 @@ export default function Profile() {
         >
           {/* Page Header - Show on all pages except main profile */}
           {!isMainProfile && (
-            <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f8f4eb] text-lg">
+            <div className="mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg">
                 {getPageIcon()}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#24312c]">
+                <h2 className="text-xl font-bold text-white">
                   {getPageTitle()}
                 </h2>
-                <p className="text-xs text-gray-500">
-                  {getPageTitle()} / Profile
+                <p className="text-xs text-gray-300">
+                  {getPageTitle()} / {t("profile.profile")}
                 </p>
               </div>
             </div>
@@ -371,10 +467,10 @@ export default function Profile() {
           {/* Dashboard Home Only */}
           {isMainProfile ? (
             <>
-              {/* Welcome Section with Decorative Elements - Added mt-2 for spacing */}
-              <div className="relative mb-8 mt-2 overflow-hidden rounded-[1.75rem] bg-gradient-to-r from-[#24312c] via-[#2f3c36] to-[#435049] p-5 shadow-xl sm:p-7 lg:mb-7">
+              {/* Welcome Section with Decorative Elements */}
+              <div className="relative mb-8 mt-2 overflow-hidden rounded-[1.75rem] bg-gradient-to-r from-[#1a3338] via-[#224248] to-[#2a5258] p-5 shadow-xl sm:p-7 lg:mb-7">
                 {/* Decorative Circles */}
-                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d4af37]/10 blur-2xl"></div>
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#d4af37]/5 blur-2xl"></div>
                 <div className="absolute -bottom-10 -left-20 h-48 w-48 rounded-full bg-[#d4af37]/5 blur-2xl"></div>
 
                 <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-5">
@@ -406,18 +502,17 @@ export default function Profile() {
                         sm:text-3xl
                       "
                     >
-                      Welcome back, {user?.fullName || "Customer"}! 👋
+                      {t("profile.welcomeBack")},{" "}
+                      {user?.fullName || t("profile.customer")}! 👋
                     </h1>
 
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-300 sm:text-base">
-                      Manage your account, orders and messages from here.
+                      {t("profile.manageAccount")}
                     </p>
                   </div>
 
                   {/* Decorative Icon */}
-                  <div className="hidden text-6xl text-white/10 sm:block">
-                    ✦
-                  </div>
+                  <div className="hidden text-6xl text-white/5 sm:block">✦</div>
                 </div>
               </div>
 
@@ -425,30 +520,26 @@ export default function Profile() {
               <div className="grid gap-4 md:grid-cols-2">
                 <InfoCard
                   icon={<FaUser className="text-[#d4af37]" />}
-                  title="Full Name"
+                  title={t("profile.fullName") || "Full Name"}
                   value={user?.fullName}
-                  gradient="from-[#24312c] to-[#3a4a42]"
                 />
 
                 <InfoCard
                   icon={<FaEnvelope className="text-[#d4af37]" />}
-                  title="Email Address"
+                  title={t("profile.email") || "Email Address"}
                   value={user?.email}
-                  gradient="from-[#d4af37] to-[#b88f1d]"
                 />
 
                 <InfoCard
                   icon={<FaPhone className="text-[#d4af37]" />}
-                  title="Phone Number"
-                  value={user?.phone || "Not added"}
-                  gradient="from-[#24312c] to-[#3a4a42]"
+                  title={t("profile.phone") || "Phone Number"}
+                  value={user?.phone || t("profile.notAdded") || "Not added"}
                 />
 
                 <InfoCard
                   icon={<FaMapMarkerAlt className="text-[#d4af37]" />}
-                  title="Shipping Address"
-                  value={user?.address || "Not added"}
-                  gradient="from-[#d4af37] to-[#b88f1d]"
+                  title={t("profile.address") || "Shipping Address"}
+                  value={user?.address || t("profile.notAdded") || "Not added"}
                 />
               </div>
             </>
@@ -482,10 +573,13 @@ export default function Profile() {
         isOpen={showLogoutModal}
         onConfirm={handleLogout}
         onCancel={() => setShowLogoutModal(false)}
-        title="Logout Confirmation"
-        message="Are you sure you want to logout? You will need to login again to access your account."
-        confirmText="Logout"
-        cancelText="Cancel"
+        title={t("profile.logoutConfirmTitle") || "Logout Confirmation"}
+        message={
+          t("profile.logoutConfirmMessage") ||
+          "Are you sure you want to logout? You will need to login again to access your account."
+        }
+        confirmText={t("profile.logout")}
+        cancelText={t("common.cancel")}
         type="danger"
         icon={<FaSignOutAlt className="text-3xl text-red-600" />}
       />
@@ -493,7 +587,7 @@ export default function Profile() {
   );
 }
 
-function InfoCard({ icon, title, value, gradient }) {
+function InfoCard({ icon, title, value }) {
   return (
     <div
       className="
@@ -502,25 +596,18 @@ function InfoCard({ icon, title, value, gradient }) {
       overflow-hidden
       rounded-[1.5rem]
       border
-      border-white/70
-      bg-white/90
+      border-white/10
+      bg-white/10
       p-5
-      shadow-[0_12px_40px_rgba(36,49,44,0.08)]
+      shadow-[0_12px_40px_rgba(0,0,0,0.15)]
       transition-all
       duration-300
       hover:-translate-y-1
       hover:shadow-xl
-      hover:border-[#d4af37]/20
+      hover:border-[#d4af37]/30
+      hover:bg-white/15
       "
     >
-      {/* Gradient Background on Hover */}
-      <div
-        className={`
-          absolute inset-0 bg-gradient-to-br ${gradient} 
-          opacity-0 transition-opacity duration-300 group-hover:opacity-[0.03]
-        `}
-      ></div>
-
       <div
         className="
         mb-4
@@ -537,11 +624,11 @@ function InfoCard({ icon, title, value, gradient }) {
           items-center
           justify-center
           rounded-2xl
-          bg-[#f8f4eb]
+          bg-white/10
           text-lg
           transition-all
           duration-300
-          group-hover:bg-[#d4af37]/10
+          group-hover:bg-[#d4af37]/20
           group-hover:scale-110
           "
         >
@@ -552,14 +639,14 @@ function InfoCard({ icon, title, value, gradient }) {
           className="
           text-sm
           font-semibold
-          text-[#24312c]
+          text-white
           "
         >
           {title}
         </h3>
       </div>
 
-      <p className="break-words text-sm leading-6 text-gray-600 group-hover:text-[#24312c] transition-colors duration-300">
+      <p className="break-words text-sm leading-6 text-gray-300 group-hover:text-white transition-colors duration-300">
         {value || "Not available"}
       </p>
 

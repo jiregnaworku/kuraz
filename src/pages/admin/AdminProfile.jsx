@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   FaUser,
   FaEnvelope,
@@ -15,8 +15,10 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import { useLanguage } from "../../context/LanguageContext";
 
-const API_URL = "http://localhost:5000/api/users";
+const API_URL = "https://kuraz-backend-sin2.onrender.com/api/users";
+// const API_URL = "http://localhost:5000/api/users";
 
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
@@ -28,8 +30,10 @@ const getAuthHeader = () => {
 };
 
 export default function AdminProfile() {
+  const { t } = useLanguage();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -43,7 +47,7 @@ export default function AdminProfile() {
   // Fetch Admin Profile
   // ===============================
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_URL}/me`, getAuthHeader());
@@ -58,16 +62,16 @@ export default function AdminProfile() {
       });
     } catch (error) {
       console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile");
+      toast.error(t("admin.failedToLoad") || "Failed to load profile");
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProfile();
-  }, []);
+  }, [fetchProfile]);
 
   // ===============================
   // Handle Input Change
@@ -87,6 +91,7 @@ export default function AdminProfile() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setSaving(true);
 
     try {
       const response = await axios.put(
@@ -98,7 +103,9 @@ export default function AdminProfile() {
       const updatedUser = response.data.user || response.data;
       setUser(updatedUser);
       setEditing(false);
-      toast.success("Profile updated successfully! 🎉");
+      toast.success(
+        t("admin.profileUpdated") || "Profile updated successfully! 🎉",
+      );
 
       // Update local storage
       const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -108,7 +115,13 @@ export default function AdminProfile() {
       );
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      toast.error(
+        error.response?.data?.message ||
+          t("admin.failedToSave") ||
+          "Failed to update profile",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -145,7 +158,7 @@ export default function AdminProfile() {
       <div className="flex min-h-[500px] items-center justify-center">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-[#d4af37] border-t-transparent"></div>
-          <p className="mt-4 text-gray-500">Loading profile...</p>
+          <p className="mt-4 text-gray-500">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -156,10 +169,10 @@ export default function AdminProfile() {
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#24312c]">Admin Profile</h1>
-          <p className="mt-1 text-gray-500">
-            Manage your account information and settings
-          </p>
+          <h1 className="text-3xl font-bold text-[#24312c]">
+            {t("admin.adminProfile")}
+          </h1>
+          <p className="mt-1 text-gray-500">{t("admin.adminProfileDesc")}</p>
         </div>
 
         {/* Profile Card */}
@@ -181,7 +194,7 @@ export default function AdminProfile() {
             <div className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-[#d4af37] shadow-lg backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 <FaUserShield className="text-[#d4af37]" />
-                <span>Administrator</span>
+                <span>{t("admin.administrator")}</span>
               </div>
             </div>
           </div>
@@ -208,7 +221,7 @@ export default function AdminProfile() {
                     className="flex items-center gap-2 rounded-xl bg-[#d4af37] px-6 py-2.5 font-medium text-white transition hover:bg-[#b88f1d] hover:shadow-lg"
                   >
                     <FaEdit />
-                    Edit Profile
+                    {t("admin.editProfile")}
                   </button>
                 </div>
 
@@ -220,9 +233,11 @@ export default function AdminProfile() {
                         <FaUser />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Full Name</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.fullName")}
+                        </p>
                         <p className="font-medium text-[#24312c]">
-                          {user?.fullName || "Not set"}
+                          {user?.fullName || t("common.notSet") || "Not set"}
                         </p>
                       </div>
                     </div>
@@ -234,9 +249,11 @@ export default function AdminProfile() {
                         <FaEnvelope />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Email</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.email")}
+                        </p>
                         <p className="font-medium text-[#24312c]">
-                          {user?.email || "Not set"}
+                          {user?.email || t("common.notSet") || "Not set"}
                         </p>
                       </div>
                     </div>
@@ -248,9 +265,11 @@ export default function AdminProfile() {
                         <FaPhone />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.phone")}
+                        </p>
                         <p className="font-medium text-[#24312c]">
-                          {user?.phone || "Not set"}
+                          {user?.phone || t("common.notSet") || "Not set"}
                         </p>
                       </div>
                     </div>
@@ -262,9 +281,11 @@ export default function AdminProfile() {
                         <FaMapMarkerAlt />
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Address</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.address")}
+                        </p>
                         <p className="font-medium text-[#24312c]">
-                          {user?.address || "Not set"}
+                          {user?.address || t("common.notSet") || "Not set"}
                         </p>
                       </div>
                     </div>
@@ -274,7 +295,7 @@ export default function AdminProfile() {
                 {/* Bio Section */}
                 {user?.bio && (
                   <div className="mt-6 rounded-xl border border-gray-100 bg-gray-50/50 p-4">
-                    <p className="text-xs text-gray-500">Bio</p>
+                    <p className="text-xs text-gray-500">{t("admin.bio")}</p>
                     <p className="mt-1 text-[#24312c]">{user.bio}</p>
                   </div>
                 )}
@@ -285,7 +306,9 @@ export default function AdminProfile() {
                     <div className="flex items-center gap-3">
                       <FaUserShield className="text-[#d4af37]" />
                       <div>
-                        <p className="text-xs text-gray-500">Role</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.role")}
+                        </p>
                         <p className="text-sm font-medium text-[#24312c]">
                           {user?.role || "Admin"}
                         </p>
@@ -294,7 +317,9 @@ export default function AdminProfile() {
                     <div className="flex items-center gap-3">
                       <FaStore className="text-[#d4af37]" />
                       <div>
-                        <p className="text-xs text-gray-500">Store</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.store") || "Store"}
+                        </p>
                         <p className="text-sm font-medium text-[#24312c]">
                           Kuraz Design
                         </p>
@@ -303,7 +328,9 @@ export default function AdminProfile() {
                     <div className="flex items-center gap-3">
                       <FaCalendarAlt className="text-[#d4af37]" />
                       <div>
-                        <p className="text-xs text-gray-500">Joined</p>
+                        <p className="text-xs text-gray-500">
+                          {t("admin.joined")}
+                        </p>
                         <p className="text-sm font-medium text-[#24312c]">
                           {user?.createdAt
                             ? new Date(user.createdAt).toLocaleDateString()
@@ -320,26 +347,27 @@ export default function AdminProfile() {
                 <div className="flex items-start justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-[#24312c]">
-                      Edit Profile
+                      {t("admin.editProfile")}
                     </h2>
                     <p className="text-gray-500">
-                      Update your account information
+                      {t("admin.editProfileDesc")}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-6 py-2.5 font-medium text-gray-600 transition hover:bg-gray-50"
+                    disabled={saving}
+                    className="flex items-center gap-2 rounded-xl border border-gray-200 px-6 py-2.5 font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
                   >
                     <FaTimes />
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                 </div>
 
                 <div className="mt-8 grid gap-6 sm:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium text-[#24312c]">
-                      Full Name *
+                      {t("admin.fullName")} *
                     </label>
                     <input
                       type="text"
@@ -353,7 +381,7 @@ export default function AdminProfile() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-[#24312c]">
-                      Email *
+                      {t("admin.email")} *
                     </label>
                     <input
                       type="email"
@@ -367,7 +395,7 @@ export default function AdminProfile() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-[#24312c]">
-                      Phone
+                      {t("admin.phone")}
                     </label>
                     <input
                       type="tel"
@@ -381,14 +409,16 @@ export default function AdminProfile() {
 
                   <div>
                     <label className="mb-2 block text-sm font-medium text-[#24312c]">
-                      Address
+                      {t("admin.address")}
                     </label>
                     <input
                       type="text"
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
-                      placeholder="Your address"
+                      placeholder={
+                        t("admin.addressPlaceholder") || "Your address"
+                      }
                       className="w-full rounded-xl border border-gray-300 px-4 py-3 text-[#24312c] outline-none transition focus:border-[#d4af37]"
                     />
                   </div>
@@ -396,14 +426,16 @@ export default function AdminProfile() {
 
                 <div className="mt-6">
                   <label className="mb-2 block text-sm font-medium text-[#24312c]">
-                    Bio
+                    {t("admin.bio")}
                   </label>
                   <textarea
                     name="bio"
                     value={formData.bio}
                     onChange={handleChange}
                     rows="3"
-                    placeholder="Tell us about yourself..."
+                    placeholder={
+                      t("admin.bioPlaceholder") || "Tell us about yourself..."
+                    }
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 text-[#24312c] outline-none transition focus:border-[#d4af37]"
                   />
                 </div>
@@ -411,10 +443,13 @@ export default function AdminProfile() {
                 <div className="mt-8 flex gap-4">
                   <button
                     type="submit"
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#d4af37] px-6 py-3 font-medium text-white transition hover:bg-[#b88f1d] hover:shadow-lg"
+                    disabled={saving}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#d4af37] px-6 py-3 font-medium text-white transition hover:bg-[#b88f1d] hover:shadow-lg disabled:opacity-50"
                   >
                     <FaSave />
-                    Save Changes
+                    {saving
+                      ? t("common.saving") || "Saving..."
+                      : t("admin.saveChanges")}
                   </button>
                 </div>
               </form>
@@ -425,10 +460,10 @@ export default function AdminProfile() {
         {/* Security Section */}
         <div className="mt-8 overflow-hidden rounded-3xl bg-white shadow-2xl">
           <div className="border-b border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-[#24312c]">Security</h3>
-            <p className="text-sm text-gray-500">
-              Manage your account security settings
-            </p>
+            <h3 className="text-lg font-bold text-[#24312c]">
+              {t("admin.security")}
+            </h3>
+            <p className="text-sm text-gray-500">{t("admin.securityDesc")}</p>
           </div>
           <div className="p-6">
             <div className="flex items-center justify-between rounded-xl border border-gray-100 p-4">
@@ -437,17 +472,19 @@ export default function AdminProfile() {
                   <FaShieldAlt />
                 </div>
                 <div>
-                  <p className="font-medium text-[#24312c]">Password</p>
+                  <p className="font-medium text-[#24312c]">
+                    {t("admin.password")}
+                  </p>
                   <p className="text-sm text-gray-500">
-                    Last changed:{" "}
+                    {t("admin.lastChanged")}:{" "}
                     {user?.passwordChangedAt
                       ? new Date(user.passwordChangedAt).toLocaleDateString()
-                      : "Never"}
+                      : t("admin.never")}
                   </p>
                 </div>
               </div>
               <button className="rounded-xl bg-[#24312c] px-6 py-2 text-sm font-medium text-white transition hover:bg-[#18201d]">
-                Change Password
+                {t("admin.changePassword")}
               </button>
             </div>
           </div>

@@ -2,8 +2,10 @@ import { useState } from "react";
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaSave } from "react-icons/fa";
 
 import { updateProfile, changePassword } from "../../api/profileApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Settings() {
+  const { t } = useLanguage();
   const [profileData, setProfileData] = useState({
     fullName: "",
     email: "",
@@ -17,6 +19,7 @@ export default function Settings() {
   });
 
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
 
   const handleProfileChange = (e) => {
     setProfileData({
@@ -35,29 +38,34 @@ export default function Settings() {
   const handleUpdateProfile = async () => {
     try {
       await updateProfile(profileData);
-
-      setMessage("Profile updated successfully");
+      setMessage(
+        t("settings.profileUpdated") || "Profile updated successfully",
+      );
+      setMessageType("success");
       // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      setMessage("Profile update failed");
+      setMessage(t("settings.profileUpdateFailed") || "Profile update failed");
+      setMessageType("error");
     }
   };
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage("Passwords do not match");
-
+      setMessage(t("settings.passwordsDoNotMatch") || "Passwords do not match");
+      setMessageType("error");
       return;
     }
 
     try {
       await changePassword({
         currentPassword: passwordData.currentPassword,
-
         newPassword: passwordData.newPassword,
       });
 
-      setMessage("Password changed successfully");
+      setMessage(
+        t("settings.passwordChanged") || "Password changed successfully",
+      );
+      setMessageType("success");
 
       setPasswordData({
         currentPassword: "",
@@ -66,7 +74,10 @@ export default function Settings() {
       });
       // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      setMessage("Password change failed");
+      setMessage(
+        t("settings.passwordChangeFailed") || "Password change failed",
+      );
+      setMessageType("error");
     }
   };
 
@@ -96,7 +107,7 @@ export default function Settings() {
           text-[#24312c]
           "
         >
-          Account Settings
+          {t("settings.title")}
         </h1>
 
         <p
@@ -105,18 +116,15 @@ export default function Settings() {
           text-gray-500
           "
         >
-          Manage your personal information and security.
+          {t("settings.subtitle")}
         </p>
       </div>
 
       {message && (
         <p
-          className="
-          mb-5
-          text-center
-          font-semibold
-          text-[#d4af37]
-          "
+          className={`mb-5 text-center font-semibold ${
+            messageType === "success" ? "text-green-600" : "text-red-500"
+          }`}
         >
           {message}
         </p>
@@ -133,12 +141,12 @@ export default function Settings() {
           text-[#24312c]
           "
         >
-          Personal Information
+          {t("settings.personalInfo")}
         </h2>
 
         <Input
           icon={<FaUser />}
-          label="Full Name"
+          label={t("settings.fullName")}
           name="fullName"
           value={profileData.fullName}
           onChange={handleProfileChange}
@@ -146,7 +154,7 @@ export default function Settings() {
 
         <Input
           icon={<FaEnvelope />}
-          label="Email"
+          label={t("settings.email")}
           name="email"
           value={profileData.email}
           onChange={handleProfileChange}
@@ -154,7 +162,7 @@ export default function Settings() {
 
         <Input
           icon={<FaPhone />}
-          label="Phone"
+          label={t("settings.phone")}
           name="phone"
           value={profileData.phone}
           onChange={handleProfileChange}
@@ -178,7 +186,7 @@ export default function Settings() {
           "
         >
           <FaSave />
-          Save Profile
+          {t("settings.saveProfile")}
         </button>
       </div>
 
@@ -193,12 +201,12 @@ export default function Settings() {
           text-[#24312c]
           "
         >
-          Change Password
+          {t("settings.changePassword")}
         </h2>
 
         <Input
           icon={<FaLock />}
-          label="Current Password"
+          label={t("settings.currentPassword")}
           name="currentPassword"
           type="password"
           value={passwordData.currentPassword}
@@ -207,7 +215,7 @@ export default function Settings() {
 
         <Input
           icon={<FaLock />}
-          label="New Password"
+          label={t("settings.newPassword")}
           name="newPassword"
           type="password"
           value={passwordData.newPassword}
@@ -216,7 +224,7 @@ export default function Settings() {
 
         <Input
           icon={<FaLock />}
-          label="Confirm New Password"
+          label={t("settings.confirmPassword")}
           name="confirmPassword"
           type="password"
           value={passwordData.confirmPassword}
@@ -241,7 +249,7 @@ export default function Settings() {
           "
         >
           <FaLock />
-          Update Password
+          {t("settings.updatePassword")}
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
+// src/components/AdminNavbar.jsx
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-
 import {
   FaBars,
   FaTimes,
@@ -13,42 +13,49 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaHome,
+  FaGlobe,
 } from "react-icons/fa";
-
-import ConfirmModal from "../components/profile/ConfirmModal"; // Import the modal
+import { useLanguage } from "../context/LanguageContext";
+import ConfirmModal from "./profile/ConfirmModal";
 
 export default function AdminNavbar() {
   const navigate = useNavigate();
+  const { language, setLanguage, t } = useLanguage();
 
   const [open, setOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const admin = JSON.parse(localStorage.getItem("user") || "null");
 
+  // Toggle language function
+  const toggleLanguage = () => {
+    setLanguage(language === "en" ? "am" : "en");
+  };
+
   const menu = [
     {
-      name: "Dashboard",
+      name: t("admin.dashboard") || "Dashboard",
       path: "/admin",
       icon: <FaTachometerAlt />,
       end: true,
     },
     {
-      name: "Orders",
+      name: t("admin.ordersManagement") || "Orders",
       path: "/admin/orders",
       icon: <FaShoppingBag />,
     },
     {
-      name: "Products",
+      name: t("admin.productManagement") || "Products",
       path: "/admin/products",
       icon: <FaBoxOpen />,
     },
     {
-      name: "Users",
+      name: t("admin.userManagement") || "Users",
       path: "/admin/users",
       icon: <FaUsers />,
     },
     {
-      name: "Messages",
+      name: t("admin.messages") || "Messages",
       path: "/admin/messages",
       icon: <FaComments />,
     },
@@ -119,7 +126,7 @@ export default function AdminNavbar() {
               sm:p-2.5
               md:hidden
               "
-              title="Back to Home"
+              title={t("admin.backToHome")}
             >
               <FaHome className="text-xs sm:text-sm" />
             </Link>
@@ -181,6 +188,30 @@ export default function AdminNavbar() {
             lg:flex
             "
           >
+            {/* Language Toggle - Syncs with Home page */}
+            <button
+              onClick={toggleLanguage}
+              className="
+              flex
+              items-center
+              gap-1.5
+              rounded-xl
+              bg-white/10
+              px-3
+              py-2
+              text-sm
+              text-gray-200
+              transition
+              hover:bg-white/20
+              hover:text-[#d4af37]
+              "
+            >
+              <FaGlobe className="text-xs xl:text-sm" />
+              <span className="hidden xl:inline">
+                {language === "en" ? "አማ" : "EN"}
+              </span>
+            </button>
+
             {/* Back to Home - Desktop */}
             <Link
               to="/#home"
@@ -202,7 +233,7 @@ export default function AdminNavbar() {
               "
             >
               <FaHome className="text-xs xl:text-sm" />
-              <span className="hidden xl:inline">Home</span>
+              <span className="hidden xl:inline">{t("admin.backToHome")}</span>
             </Link>
 
             {/* Notifications */}
@@ -245,11 +276,11 @@ export default function AdminNavbar() {
 
               <div className="hidden sm:block">
                 <p className="text-xs font-semibold text-white sm:text-sm">
-                  {admin?.fullName?.split(" ")[0] || "Admin"}
+                  {admin?.fullName?.split(" ")[0] || t("admin.administrator")}
                 </p>
 
                 <p className="text-[10px] text-gray-400 sm:text-xs">
-                  Administrator
+                  {t("admin.administrator")}
                 </p>
               </div>
             </Link>
@@ -314,7 +345,7 @@ export default function AdminNavbar() {
       >
         <div className="flex items-center justify-between border-b border-white/10 p-4 sm:p-5">
           <h2 className="text-lg font-bold text-[#d4af37] sm:text-xl">
-            Admin Menu
+            {t("admin.adminMenu")}
           </h2>
 
           <button onClick={() => setOpen(false)} className="text-white p-1">
@@ -329,12 +360,46 @@ export default function AdminNavbar() {
 
             <div>
               <h3 className="text-sm font-semibold text-white sm:text-base">
-                {admin?.fullName || "Admin"}
+                {admin?.fullName || t("admin.administrator")}
               </h3>
 
-              <p className="text-xs text-gray-400 sm:text-sm">Administrator</p>
+              <p className="text-xs text-gray-400 sm:text-sm">
+                {t("admin.administrator")}
+              </p>
             </div>
           </div>
+
+          {/* Language Toggle - Mobile */}
+          <button
+            onClick={() => {
+              toggleLanguage();
+              setOpen(false);
+            }}
+            className="
+            flex
+            w-full
+            items-center
+            gap-3
+            rounded-xl
+            px-3
+            py-2.5
+            text-sm
+            text-gray-200
+            transition
+            hover:bg-white/10
+            sm:px-4
+            sm:py-3
+            mb-2
+            "
+          >
+            <FaGlobe className="text-base sm:text-lg" />
+            <span className="text-sm sm:text-base">
+              {language === "en" ? "አማርኛ" : "English"}
+            </span>
+            <span className="ml-auto text-xs text-gray-400">
+              {language === "en" ? "ለውጥ" : "Switch"}
+            </span>
+          </button>
 
           {/* Navigation Links */}
           <nav className="space-y-1 sm:space-y-2">
@@ -377,7 +442,9 @@ export default function AdminNavbar() {
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-200 transition hover:bg-white/10 sm:px-4 sm:py-3"
             >
               <FaBell className="text-base sm:text-lg" />
-              <span className="text-sm sm:text-base">Notifications</span>
+              <span className="text-sm sm:text-base">
+                {t("admin.notifications")}
+              </span>
               <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                 0
               </span>
@@ -409,7 +476,9 @@ export default function AdminNavbar() {
               }
             >
               <FaUserCircle className="text-base sm:text-lg" />
-              <span className="text-sm sm:text-base">Profile</span>
+              <span className="text-sm sm:text-base">
+                {t("admin.adminProfile")}
+              </span>
             </NavLink>
 
             {/* Back to Home - Mobile */}
@@ -419,7 +488,9 @@ export default function AdminNavbar() {
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-200 transition hover:bg-white/10 sm:px-4 sm:py-3"
             >
               <FaHome className="text-base sm:text-lg" />
-              <span className="text-sm sm:text-base">Back to Home</span>
+              <span className="text-sm sm:text-base">
+                {t("admin.backToHome")}
+              </span>
             </Link>
 
             {/* Divider */}
@@ -450,7 +521,7 @@ export default function AdminNavbar() {
               "
             >
               <FaSignOutAlt className="text-base sm:text-lg" />
-              <span className="text-sm sm:text-base">Logout</span>
+              <span className="text-sm sm:text-base">{t("admin.logout")}</span>
             </button>
           </nav>
         </div>
@@ -476,10 +547,10 @@ export default function AdminNavbar() {
         isOpen={showLogoutModal}
         onConfirm={handleLogout}
         onCancel={() => setShowLogoutModal(false)}
-        title="Logout Confirmation"
-        message="Are you sure you want to logout from the admin panel? You will need to login again to access the dashboard."
-        confirmText="Logout"
-        cancelText="Cancel"
+        title={t("admin.logoutConfirmTitle")}
+        message={t("admin.logoutConfirmMessage")}
+        confirmText={t("admin.logout")}
+        cancelText={t("common.cancel")}
         type="danger"
         icon={<FaSignOutAlt className="text-3xl text-red-600" />}
       />

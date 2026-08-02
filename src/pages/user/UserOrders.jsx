@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import OrderCard from "../../components/profile/OrderCard";
 import { getMyOrders } from "../../api/OrderApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function UserOrders() {
+  const { t } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +22,9 @@ export default function UserOrders() {
         // Check if user is logged in
         const token = localStorage.getItem("token");
         if (!token) {
-          setError("Please login to view your orders");
+          setError(
+            t("orders.loginRequired") || "Please login to view your orders",
+          );
           setLoading(false);
           // Redirect to login after a moment
           setTimeout(() => {
@@ -38,14 +42,20 @@ export default function UserOrders() {
 
         // Handle different error cases
         if (error.response?.status === 401) {
-          setError("Session expired. Please login again.");
+          setError(
+            t("orders.sessionExpired") ||
+              "Session expired. Please login again.",
+          );
           setTimeout(() => {
             navigate("/signin");
           }, 2000);
         } else if (error.response?.status === 404) {
-          setError("No orders found.");
+          setError(t("orders.noOrdersFound") || "No orders found.");
         } else {
-          setError("Failed to load orders. Please try again.");
+          setError(
+            t("orders.loadFailed") ||
+              "Failed to load orders. Please try again.",
+          );
         }
       } finally {
         setLoading(false);
@@ -53,7 +63,7 @@ export default function UserOrders() {
     };
 
     fetchOrders();
-  }, [navigate]);
+  }, [navigate, t]);
 
   // Handle retry
   const handleRetry = () => {
@@ -64,7 +74,7 @@ export default function UserOrders() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#d4af37] border-t-transparent"></div>
-        <p className="mt-4 text-gray-500">Loading your orders...</p>
+        <p className="mt-4 text-gray-500">{t("common.loading")}</p>
       </div>
     );
   }
@@ -74,14 +84,14 @@ export default function UserOrders() {
       <div className="flex flex-col items-center justify-center rounded-2xl border border-red-100 bg-red-50 py-16 px-4">
         <div className="mb-4 text-5xl text-red-400">⚠️</div>
         <h3 className="text-lg font-semibold text-red-600">
-          Oops! Something went wrong
+          {t("orders.errorTitle") || "Oops! Something went wrong"}
         </h3>
         <p className="mt-2 text-gray-600">{error}</p>
         <button
           onClick={handleRetry}
           className="mt-6 rounded-xl bg-[#d4af37] px-6 py-2.5 font-medium text-white transition hover:bg-[#b88f1d]"
         >
-          Try Again
+          {t("orders.tryAgain") || "Try Again"}
         </button>
       </div>
     );
@@ -91,25 +101,23 @@ export default function UserOrders() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#24312c]">My Orders</h1>
-          <p className="mt-2 text-gray-500">
-            Track your fashion orders and delivery status.
-          </p>
+          <h1 className="text-3xl font-bold text-[#24312c]">
+            {t("orders.myOrders")}
+          </h1>
+          <p className="mt-2 text-gray-500">{t("orders.trackOrders")}</p>
         </div>
 
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-white/50 py-16 px-4">
           <FaBoxOpen className="mb-4 text-6xl text-[#d4af37]/60" />
           <h3 className="text-xl font-semibold text-[#24312c]">
-            No orders yet
+            {t("orders.noOrders")}
           </h3>
-          <p className="mt-2 text-gray-500">
-            You haven't placed any orders yet.
-          </p>
+          <p className="mt-2 text-gray-500">{t("orders.noOrdersMessage")}</p>
           <button
             onClick={() => navigate("/home")}
             className="mt-6 rounded-xl bg-[#d4af37] px-6 py-2.5 font-medium text-white transition hover:bg-[#b88f1d]"
           >
-            Start Shopping
+            {t("orders.startShopping")}
           </button>
         </div>
       </div>
@@ -121,13 +129,16 @@ export default function UserOrders() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#24312c]">My Orders</h1>
-            <p className="mt-2 text-gray-500">
-              Track your fashion orders and delivery status.
-            </p>
+            <h1 className="text-3xl font-bold text-[#24312c]">
+              {t("orders.myOrders")}
+            </h1>
+            <p className="mt-2 text-gray-500">{t("orders.trackOrders")}</p>
           </div>
           <div className="rounded-full bg-[#d4af37]/10 px-4 py-2 text-sm font-medium text-[#d4af37]">
-            {orders.length} {orders.length === 1 ? "Order" : "Orders"}
+            {orders.length}{" "}
+            {orders.length === 1
+              ? t("orders.order") || "Order"
+              : t("orders.orders") || "Orders"}
           </div>
         </div>
       </div>

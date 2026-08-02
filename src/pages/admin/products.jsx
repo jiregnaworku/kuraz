@@ -3,7 +3,8 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 
 import ProductTable from "./ProductTable";
 import ProductForm from "./ProductForm";
-import ConfirmModal from "../../components/profile/ConfirmModal"; // Import the modal
+import ConfirmModal from "../../components/profile/ConfirmModal";
+import { useLanguage } from "../../context/LanguageContext";
 
 import {
   getProducts,
@@ -13,6 +14,7 @@ import {
 } from "../../api/productApi";
 
 export default function Products() {
+  const { t } = useLanguage();
   const [products, setProducts] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ export default function Products() {
       setProducts(data);
     } catch (error) {
       console.error(error);
-      alert("Failed to load products.");
+      alert(t("admin.failedToLoad") || "Failed to load products.");
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export default function Products() {
       fetchProducts();
     } catch (error) {
       console.error(error);
-      alert("Failed to save product.");
+      alert(t("admin.failedToSave") || "Failed to save product.");
     } finally {
       setSaving(false);
     }
@@ -117,7 +119,7 @@ export default function Products() {
       fetchProducts();
     } catch (error) {
       console.error(error);
-      alert("Failed to delete product.");
+      alert(t("admin.failedToDelete") || "Failed to delete product.");
     } finally {
       setDeleting(false);
     }
@@ -134,11 +136,11 @@ export default function Products() {
       <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-4xl font-bold text-[#24312c]">
-            Product Management
+            {t("admin.productManagement")}
           </h1>
 
           <p className="mt-2 text-gray-500">
-            Manage your Kuraz Design products.
+            {t("admin.productManagementDesc")}
           </p>
         </div>
 
@@ -147,7 +149,7 @@ export default function Products() {
           className="flex items-center gap-3 rounded-xl bg-[#d4af37] px-6 py-4 font-semibold text-white transition hover:bg-[#b88b21]"
         >
           <FaPlus />
-          Add Product
+          {t("admin.addProduct")}
         </button>
       </div>
 
@@ -180,10 +182,15 @@ export default function Products() {
           isOpen={true}
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
-          title={`Delete Product`}
-          message={`Are you sure you want to delete "${deleteProductData.name || deleteProductData.productName || "this product"}"? This action cannot be undone. All product data will be permanently removed.`}
-          confirmText="Delete Product"
-          cancelText="Cancel"
+          title={t("admin.deleteProduct")}
+          message={t("admin.deleteProductConfirm", {
+            productName:
+              deleteProductData.name ||
+              deleteProductData.productName ||
+              t("admin.thisProduct"),
+          })}
+          confirmText={t("admin.deleteProduct")}
+          cancelText={t("common.cancel")}
           type="danger"
           icon={<FaTrash className="text-3xl text-red-600" />}
           danger={true}

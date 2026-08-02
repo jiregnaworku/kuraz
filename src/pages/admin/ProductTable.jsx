@@ -1,10 +1,13 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ProductTable({ products, onEdit, onDelete, loading }) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="rounded-2xl bg-white p-8 text-center shadow">
-        <p className="text-gray-600">Loading products...</p>
+        <p className="text-gray-600">{t("common.loading")}</p>
       </div>
     );
   }
@@ -12,7 +15,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
   if (!products || products.length === 0) {
     return (
       <div className="rounded-2xl bg-white p-8 text-center shadow">
-        <p className="text-gray-600">No products found.</p>
+        <p className="text-gray-600">{t("admin.noProducts")}</p>
       </div>
     );
   }
@@ -26,31 +29,31 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
           <thead className="bg-[#24312c] text-white">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Image
+                {t("admin.image")}
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Name
+                {t("admin.name")}
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Category
+                {t("admin.category")}
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Price
+                {t("admin.price")}
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Stock
+                {t("admin.stock")}
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Featured
+                {t("admin.featured")}
               </th>
 
               <th className="px-6 py-4 text-center text-sm font-semibold">
-                Actions
+                {t("admin.actions")}
               </th>
             </tr>
           </thead>
@@ -92,7 +95,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
                       text-gray-500
                       "
                     >
-                      No Image
+                      {t("admin.noImage")}
                     </div>
                   )}
                 </td>
@@ -132,7 +135,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
                       text-green-700
                       "
                     >
-                      Yes
+                      {t("admin.featuredYes")}
                     </span>
                   ) : (
                     <span
@@ -145,7 +148,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
                       text-gray-600
                       "
                     >
-                      No
+                      {t("admin.featuredNo")}
                     </span>
                   )}
                 </td>
@@ -164,7 +167,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
                       transition
                       hover:bg-blue-600
                       "
-                      title="Edit Product"
+                      title={t("admin.edit")}
                     >
                       <FaEdit />
                     </button>
@@ -179,7 +182,7 @@ export default function ProductTable({ products, onEdit, onDelete, loading }) {
                       transition
                       hover:bg-red-600
                       "
-                      title="Delete Product"
+                      title={t("admin.delete")}
                     >
                       <FaTrash />
                     </button>

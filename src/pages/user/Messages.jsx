@@ -4,10 +4,12 @@ import { io } from "socket.io-client";
 
 import MessageBubble from "../../components/profile/MessageBubble";
 import { getMessages, sendMessage } from "../../api/messageApi";
+import { useLanguage } from "../../context/LanguageContext";
 
 const socket = io("https://kuraz-backend-sin2.onrender.com");
 
 export default function Messages() {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState([]);
 
   const [newMessage, setNewMessage] = useState("");
@@ -115,7 +117,7 @@ export default function Messages() {
       sm:text-base
       "
       >
-        Loading conversations...
+        {t("common.loading")}
       </div>
     );
   }
@@ -199,7 +201,7 @@ export default function Messages() {
           sm:text-2xl
           "
           >
-            Kuraz Support
+            {t("messages.kurazSupport") || "Kuraz Support"}
           </h1>
 
           <p
@@ -212,7 +214,8 @@ export default function Messages() {
           xs:text-sm
           "
           >
-            Orders, products and delivery help
+            {t("messages.supportDescription") ||
+              "Orders, products and delivery help"}
           </p>
         </div>
       </div>
@@ -278,7 +281,7 @@ export default function Messages() {
               sm:text-lg
               "
             >
-              Start conversation
+              {t("messages.startConversation") || "Start conversation"}
             </h3>
 
             <p
@@ -295,7 +298,8 @@ export default function Messages() {
               sm:text-sm
               "
             >
-              Ask about your order, custom dresses or delivery.
+              {t("messages.startConversationDesc") ||
+                "Ask about your order, custom dresses or delivery."}
             </p>
           </div>
         )}
@@ -338,7 +342,7 @@ export default function Messages() {
                 handleSend();
               }
             }}
-            placeholder="Write message..."
+            placeholder={t("messages.writeMessage") || "Write message..."}
             className="
           min-w-0
           flex-1

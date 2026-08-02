@@ -7,8 +7,11 @@ import {
   FaTimesCircle,
   FaClock,
 } from "react-icons/fa";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function OrderCard({ order }) {
+  const { t } = useLanguage();
+
   const getStatusIcon = (status) => {
     switch (status) {
       case "Delivered":
@@ -29,6 +32,18 @@ export default function OrderCard({ order }) {
       default:
         return "bg-yellow-50 text-yellow-700 border-yellow-200";
     }
+  };
+
+  const getStatusTranslation = (status) => {
+    const statusMap = {
+      Pending: t("order.statusPending") || "Pending",
+      Accepted: t("order.statusAccepted") || "Accepted",
+      Preparing: t("order.statusPreparing") || "Preparing",
+      Shipping: t("order.statusShipping") || "Shipping",
+      Delivered: t("order.statusDelivered") || "Delivered",
+      Cancelled: t("order.statusCancelled") || "Cancelled",
+    };
+    return statusMap[status] || status;
   };
 
   return (
@@ -81,7 +96,7 @@ export default function OrderCard({ order }) {
           `}
         >
           {getStatusIcon(order.orderStatus)}
-          <span>{order.orderStatus}</span>
+          <span>{getStatusTranslation(order.orderStatus)}</span>
         </div>
       </div>
 
@@ -115,12 +130,12 @@ export default function OrderCard({ order }) {
           <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
             <div className="flex items-center gap-1.5 text-gray-500">
               <FaRuler className="text-[10px] text-[#d4af37]" />
-              <span>{order.size || "N/A"}</span>
+              <span>{order.size || t("order.notSpecified") || "N/A"}</span>
             </div>
 
             <div className="flex items-center gap-1.5 text-gray-500">
               <FaPalette className="text-[10px] text-[#d4af37]" />
-              <span>{order.color || "N/A"}</span>
+              <span>{order.color || t("order.notSpecified") || "N/A"}</span>
             </div>
 
             <div className="flex items-center gap-1.5 text-gray-500 col-span-2">
@@ -141,14 +156,14 @@ export default function OrderCard({ order }) {
       {/* Payment & Note - Compact */}
       <div className="mt-3 rounded-lg bg-gray-50/80 p-2.5 text-xs">
         <div className="flex items-center justify-between">
-          <span className="text-gray-500">Payment:</span>
+          <span className="text-gray-500">{t("order.paymentMethod")}:</span>
           <span className="font-medium text-[#24312c]">
             {order.paymentMethod}
           </span>
         </div>
         {order.note && (
           <div className="mt-1 flex items-start gap-1.5 border-t border-gray-100 pt-1.5">
-            <span className="text-gray-500">Note:</span>
+            <span className="text-gray-500">{t("order.note")}:</span>
             <span className="text-gray-600 line-clamp-1">{order.note}</span>
           </div>
         )}
@@ -167,7 +182,7 @@ export default function OrderCard({ order }) {
             hover:scale-105
           "
         >
-          View Details →
+          {t("order.viewDetails")} →
         </button>
       </div>
     </div>
